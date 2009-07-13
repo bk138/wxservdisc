@@ -30,7 +30,7 @@
 
 #include "MyFrameMain.h"
 #include "MyDialogSettings.h"
-#include "../config.h"
+#include "../dfltcfg.h"
 #include "../SdwrapApp.h"
 
 

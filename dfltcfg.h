@@ -1,5 +1,5 @@
 /* 
-   config.h: applicationwide defines for config keys and values 
+   dfltcfg.h: applicationwide defines for config keys and values 
 
    This file is part of SDWrap, a crossplatform wxWidgets
    Zeroconf service discovery wrapper.

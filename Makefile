@@ -42,11 +42,11 @@ SdwrapApp.o: gui/bitmapFromMem.h gui/res/icon.xpm wxServDisc/wxServDisc.h
 SdwrapApp.o: wxServDisc/1035.h
 gui/DialogSettings.o: gui/DialogSettings.h
 gui/FrameMain.o: gui/FrameMain.h gui/bitmapFromMem.h gui/res/icon.xpm
-gui/MyDialogSettings.o: gui/MyDialogSettings.h gui/DialogSettings.h config.h
+gui/MyDialogSettings.o: gui/MyDialogSettings.h gui/DialogSettings.h dfltcfg.h
 gui/MyFrameMain.o: gui/res/about.png.h gui/MyFrameMain.h gui/FrameMain.h
 gui/MyFrameMain.o: gui/bitmapFromMem.h gui/res/icon.xpm
 gui/MyFrameMain.o: wxServDisc/wxServDisc.h wxServDisc/1035.h
-gui/MyFrameMain.o: gui/MyDialogSettings.h gui/DialogSettings.h config.h
+gui/MyFrameMain.o: gui/MyDialogSettings.h gui/DialogSettings.h dfltcfg.h
 gui/MyFrameMain.o: SdwrapApp.h
 wxServDisc/wxServDisc.o: wxServDisc/wxServDisc.h wxServDisc/1035.h
 wxServDisc/wxServDisc.o: wxServDisc/mdnsd.h
