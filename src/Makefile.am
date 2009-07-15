@@ -18,6 +18,7 @@ bin_PROGRAMS = sdwrap
 sdwrap_SOURCES = \
 	SdwrapApp.cpp   \
 	SdwrapApp.h   \
+	dfltcfg.h \
 	gui/FrameMain.cpp \
 	gui/FrameMain.h \
 	gui/MyFrameMain.cpp \
