@@ -7,9 +7,23 @@ addresses and ports. Uses wxWidgets and wxServDisc for service discovery.
 
 
 directory layout:
-    wxServDisc: Zeroconf module
-    gui:        well, the gui (made with wxglade)
+    src/wxServDisc: Zeroconf module
+    src/gui:        well, the gui (made with wxglade)
    
     
 prerequisites:
     wxWidgets 2.8
+    
+    
+building:
+
+   ./configure 
+   
+      OR
+
+   ./configure --host= i586-mingw32msvc --with-wx-config=<your win32 wx-config>
+
+
+    make
+    
+    
