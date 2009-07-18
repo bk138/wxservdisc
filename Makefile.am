@@ -20,7 +20,6 @@ EXTRA_DIST = $(sdwrapdoc_DATA)
 if DARWIN
 bundle_contents = SDWrap.app/Contents
 appbundle: src/sdwrap
-	$(STRIP) $<
 	mkdir -p $(bundle_contents)/MacOS
 	mkdir -p $(bundle_contents)/Resources
 	echo "APPL????" > $(bundle_contents)/PkgInfo
