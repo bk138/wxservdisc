@@ -21,10 +21,8 @@
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
 */
 
-#include <iostream>
 #include "wx/aboutdlg.h"
 #include "wx/socket.h"
-
 
 #include "res/about.png.h"
 
@@ -86,7 +84,7 @@ public:
     // clean up after us
     if(do_callback)
       {
-	cerr << "calling callback" << endl;
+	wxLogDebug(wxT("SDWrap: calling callback"));
 	(m_parent->*m_callback)(m_cmd, status);
       }
     
@@ -188,7 +186,8 @@ bool MyFrameMain::spawn_client()
   client_proc = new MyProcess(this, cmd, &MyFrameMain::on_client_term);
   client_pid = wxExecute(cmd, wxEXEC_ASYNC|wxEXEC_MAKE_GROUP_LEADER, client_proc);
   
-  cerr << "spawn_client() spawns " << client_pid << endl; 
+  wxLogDebug(wxT("SDWrap: spawn_client() spawned '%i'"), client_pid);
+ 
   if ( !client_pid )
     {
       SetStatusText(_("Client execution failed."));
@@ -221,12 +220,12 @@ void MyFrameMain::kill_client()
       }
      
 
-  cerr << "kill_client() tries to kill " << client_pid << endl;
+  wxLogDebug(wxT("SDWrap: kill_client() tries to kill '%i'"), client_pid);
 
   if(client_pid)
     if(wxKill(client_pid, wxSIGTERM, NULL, wxKILL_CHILDREN) == 0)
-    {
-	cerr << "kill_client() zeros " << client_pid << endl;
+      {
+	wxLogDebug(wxT("SDWrap: kill_client() zeros '%i'"), client_pid);
 	client_pid = 0;
 	  
 	// this is "share window"
@@ -241,7 +240,7 @@ void MyFrameMain::kill_client()
 
 void MyFrameMain::on_client_term(wxString& cmd, int status)
 {
-   cerr << "on_client_term() zeros " << client_pid << endl;
+  wxLogDebug(wxT("SDWrap: on_client_term() zeros '%i'"), client_pid);
 
    if(status == 0) 
     SetStatusText(_("Client terminated gracefully."));

@@ -42,6 +42,20 @@ AC_ARG_WITH(wx-config,
         WXCONFIG=$withval
     fi
 ])
+
+
+dnl Check if we have enabled debug support.
+AC_MSG_CHECKING(whether to enable debugging)
+AC_ARG_ENABLE(debug, [  --enable-debug          enable debug build [[default=no]]],, enable_debug="no")
+if test "x$enable_debug" = "xyes"; then
+	WXCONFIG="$WXCONFIG --debug=yes"	
+	AC_MSG_RESULT(yes)
+else
+	WXCONFIG="$WXCONFIG --debug=no"	
+	AC_MSG_RESULT(no)
+fi
+
+
 AC_MSG_CHECKING([wxWidgets version])
 if wxversion=`$WXCONFIG --version`; then
     AC_MSG_RESULT([$wxversion])
