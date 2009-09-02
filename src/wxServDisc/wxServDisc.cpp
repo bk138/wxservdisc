@@ -130,14 +130,31 @@ void* ScanThread::Entry()
   while(!TestDestroy() && !exit)
     {
       tv = mdnsd_sleep(d);
-      FD_ZERO(&fds);
-      FD_SET(s,&fds);
+    
+      long secs = tv->tv_sec == 0 ? 1 : tv->tv_sec; // so that the while loop beneath gets executed once
+      wxLogDebug(wxT("wxServDisc %p: scanthread waiting for data, timeout %i secs"), p, secs);
 
-      wxLogDebug(wxT("wxServDisc: scanthread before sleeping %i secs"), tv->tv_sec);
-      // FIXME
-      select(s+1,&fds,0,0,tv);
 
-      wxLogDebug(wxT("wxServDisc: scanthread woke up"));
+      // we split the one select() call into several ones every second
+      // to be able to catch TestDestroy()...
+      int datatoread = 0;
+      while(secs && !TestDestroy() && !datatoread)
+	{
+	  // the select call leaves tv undefined, so re-set
+	  tv->tv_sec = 1;
+	  tv->tv_usec = 0;
+
+	  FD_ZERO(&fds);
+	  FD_SET(s,&fds);
+      
+	  datatoread = select(s+1,&fds,0,0,tv); // returns 0 if timeout expired
+	  
+	  if(!datatoread)
+	    --secs;
+	}
+      
+      wxLogDebug(wxT("wxServDisc %p: scanthread woke up, reason: incoming data(%i), timeout(%i), deletion(%i)"),
+		 p, datatoread, !secs, TestDestroy() );
 
       // receive
       if(FD_ISSET(s,&fds))
@@ -273,12 +290,12 @@ int ScanThread::ans(mdnsda a, void *arg)
   moi->p->SendNotify();
     
   
-  wxLogDebug(wxT("wxServDisc: got answer:"));
-  wxLogDebug(wxT("wxServDisc:    key:  %s"), key.c_str());
-  wxLogDebug(wxT("wxServDisc:    name: %s"), moi->p->results[key].name.c_str());
-  wxLogDebug(wxT("wxServDisc:    ip:   %s"), moi->p->results[key].ip.c_str());
-  wxLogDebug(wxT("wxServDisc:    port: %u"), moi->p->results[key].port);
-  wxLogDebug(wxT("wxServDisc: answer end"));
+  wxLogDebug(wxT("wxServDisc %p: got answer:"), moi->p);
+  wxLogDebug(wxT("wxServDisc %p:    key:  %s"), moi->p, key.c_str());
+  wxLogDebug(wxT("wxServDisc %p:    name: %s"), moi->p, moi->p->results[key].name.c_str());
+  wxLogDebug(wxT("wxServDisc %p:    ip:   %s"), moi->p, moi->p->results[key].ip.c_str());
+  wxLogDebug(wxT("wxServDisc %p:    port: %u"), moi->p, moi->p->results[key].port);
+  wxLogDebug(wxT("wxServDisc %p: answer end"), moi->p);
   
   return 1;
 }
@@ -370,7 +387,7 @@ SOCKET ScanThread::msock() const
 
 void ScanThread::OnExit()
 {
-  wxLogDebug(wxT("wxServDisc: scanthread querying '%s' exiting"), w.c_str());
+  wxLogDebug(wxT("wxServDisc %p: scanthread querying '%s' exiting"), p, w.c_str());
   p->scanthread = 0;
 }
 
@@ -393,7 +410,8 @@ wxServDisc::wxServDisc(void* p, const wxString& what, int type)
   // save query
   query = what;
 
-  wxLogDebug(wxT("wxServDisc: about to query '%s'"), query.c_str());
+  wxLogDebug(wxT(""));
+  wxLogDebug(wxT("wxServDisc %p: about to query '%s'"), this, query.c_str());
 
   ScanThread *st_ptr = new ScanThread(what, type, this);
 
@@ -411,13 +429,14 @@ wxServDisc::wxServDisc(void* p, const wxString& what, int type)
 
 wxServDisc::~wxServDisc()
 {
-  wxLogDebug(wxT("wxServDisc: before scanthread delete"));
+  wxLogDebug(wxT("wxServDisc %p: before scanthread delete"), this);
   static_cast<ScanThread*>(scanthread)->Delete();
   // wait for deletion to finish
   while(scanthread)
     wxMilliSleep(100);
 
-  wxLogDebug(wxT("wxServDisc: scanthread deleted, wxServDisc destroyed, query was '%s'"), query.c_str()); 
+  wxLogDebug(wxT("wxServDisc %p: scanthread deleted, wxServDisc destroyed, query was '%s'"), this, query.c_str());
+  wxLogDebug(wxT("")); 
 }
 
 
