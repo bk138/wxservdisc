@@ -41,7 +41,7 @@ appbundle: src/sdwrap
 	<key>CFBundleIconFile</key>\
 	<string>icon.icns</string>\
 	<key>CFBundleGetInfoString</key>\
-	<string>SDWrap @PACKAGE_VERSION@, © Christian Beier (dontmind@freeshell.org), 2008, 2009 </string>\
+	<string>SDWrap @PACKAGE_VERSION@, © Christian Beier (dontmind@freeshell.org), 2008-2010 </string>\
 	<key>CFBundleName</key>  \
 	<string>SDWrap</string> \
 	<key>CFBundlePackageType</key> \
