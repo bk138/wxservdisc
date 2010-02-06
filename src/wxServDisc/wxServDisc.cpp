@@ -154,6 +154,15 @@ wxThread::ExitCode wxServDisc::Entry()
   mdnsd_shutdown(d);
   mdnsd_free(d);
 
+  if(sock >= 0)
+    {
+#ifdef __WIN32__
+      closesocket(sock);
+#else
+      close(sock);
+#endif 
+    }
+
   wxLogDebug(wxT("wxServDisc %p: scanthread exiting"), this);
 
   return NULL;
@@ -283,9 +292,8 @@ int wxServDisc::ans(mdnsda a, void *arg)
 // create a multicast 224.0.0.251:5353 socket,
 // aproppriate for receiving and sending,
 // windows or unix style
-SOCKET wxServDisc::msock() const
+SOCKET wxServDisc::msock() 
 {
-  SOCKET s;
   int flag = 1;
   int ttl = 255; // multicast TTL, must be 255 for zeroconf!
 
@@ -316,41 +324,41 @@ SOCKET wxServDisc::msock() const
 
 
   // Create a new socket
-  if((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
+  if((sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
     return -1;
 
   // set to reuse address
-  setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char*)&flag, sizeof(flag));
+  setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char*)&flag, sizeof(flag));
 
   // Bind socket to port, returns 0 on success
-  if(bind(s, (struct sockaddr*) &addrLocal, sizeof(addrLocal))) 
+  if(bind(sock, (struct sockaddr*) &addrLocal, sizeof(addrLocal)) != 0) 
     { 
 #ifdef __WIN32__
-      closesocket(s);
+      closesocket(sock);
 #else
-      close(s);
+      close(sock);
 #endif 
       return -1;
     }
 
   // Set the multicast ttl
-  setsockopt(s, IPPROTO_IP, IP_MULTICAST_TTL, (char*)&ttl, sizeof(ttl));
+  setsockopt(sock, IPPROTO_IP, IP_MULTICAST_TTL, (char*)&ttl, sizeof(ttl));
 
   // Add socket to be a member of the multicast group
-  setsockopt(s, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&ipmr, sizeof(ipmr));
+  setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&ipmr, sizeof(ipmr));
 	
   // set to nonblock
 #ifdef __WIN32__
   unsigned long block=1;
-  ioctlsocket(s, FIONBIO, &block);
+  ioctlsocket(sock, FIONBIO, &block);
 #else
-  flag =  fcntl(s, F_GETFL, 0);
+  flag =  fcntl(sock, F_GETFL, 0);
   flag |= O_NONBLOCK;
-  fcntl(s, F_SETFL, flag);
+  fcntl(sock, F_SETFL, flag);
 #endif
 	
   // whooaa, that's it
-  return s;
+  return sock;
 }
 
 
@@ -390,7 +398,7 @@ wxServDisc::~wxServDisc()
   wxLogDebug(wxT("wxServDisc %p: before scanthread delete"), this);
   GetThread()->Delete(); // this makes TestDestroy() return true
   GetThread()->Wait();   // this frees the threads system resources
-  
+
   wxLogDebug(wxT("wxServDisc %p: scanthread deleted, wxServDisc destroyed, query was '%s'"), this, query.c_str());
   wxLogDebug(wxT("")); 
 }

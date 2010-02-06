@@ -63,6 +63,7 @@ WX_DECLARE_STRING_HASH_MAP(wxSDEntry, wxSDMap);
 // our main class
 class wxServDisc: public wxObject, public wxThreadHelper
 {
+  SOCKET sock;
   wxString err;
   void *parent;
   wxString query;
@@ -73,10 +74,10 @@ class wxServDisc: public wxObject, public wxThreadHelper
   virtual wxThread::ExitCode Entry();
 
   // create a multicast 224.0.0.251:5353 socket, windows or unix style
-  SOCKET msock() const; 
+  SOCKET msock(); 
   // send/receive message m
   bool sendm(struct message *m, SOCKET s, unsigned long int ip, unsigned short int port);
-  int recvm(struct message *m, SOCKET s, unsigned long int *ip, unsigned short int *port);
+  int  recvm(struct message *m, SOCKET s, unsigned long int *ip, unsigned short int *port);
   // callback for the mdns resolver
   static int ans(mdnsda a, void *caller);
 
