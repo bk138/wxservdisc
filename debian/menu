@@ -1,0 +1,2 @@
+?package(sdwrap):needs="X11" section="Applications/Network/Communication"\
+  title="SDWrap" command="/usr/bin/sdwrap"

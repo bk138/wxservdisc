@@ -1,0 +1,15 @@
+Source: sdwrap
+Section: utils
+Priority: extra
+Maintainer: Christian Beier <dontmind@freeshell.org>
+Build-Depends: debhelper (>= 7), autotools-dev, libwxgtk2.8-dev
+Standards-Version: 3.7.3
+Homepage: http://sourceforge.net/projects/sdwrap/
+
+Package: sdwrap
+Architecture: any
+Depends: ${shlibs:Depends},
+Description: Zeroconf service discovery wrapper using wxServDisc
+ Simple wrapper app to execute some command with Zeroconf supplied
+ addresses and ports. Uses wxWidgets and wxServDisc for service discovery.
+
