@@ -44,16 +44,9 @@
 #include <arpa/inet.h>
 #endif
 
-
 #include "wxServDisc.h"
-#include "mdnsd.h"
 
-// just for convenience
-// SOCKET is a unsigned int in win32!!
-// but in unix we expect signed ints!!
-#ifndef __WIN32__
-typedef int SOCKET;
-#endif
+
 
 
 // define our new notify event!
@@ -62,50 +55,13 @@ DEFINE_EVENT_TYPE(wxServDiscNOTIFY)
 
 
 
-
-
 /*
-  internal scanner thread class
+  private member functions
+
 */
-class ScanThread : public wxThread
-{
-  wxServDisc *p; // our parent object
-  wxString w;   // query what?
-  int t;        // query type
-
-  // create a multicast 224.0.0.251:5353 socket, windows or unix style
-  SOCKET msock() const; 
-  // send/receive message m
-  bool sendm(struct message *m, SOCKET s, unsigned long int ip, unsigned short int port);
-  int recvm(struct message *m, SOCKET s, unsigned long int *ip, unsigned short int *port);
   
-  static int ans(mdnsda a, void *caller);
 
-
-public:
-  ScanThread(const wxString& what, int type, wxServDisc *parent);
-  
-  // thread execution starts here
-  virtual void* Entry();
-  
-  // called when the thread exits - whether it terminates normally or is
-  // stopped with Delete() (but not when it is Kill()ed!)
-  virtual void OnExit();
-};
-
-
-
-ScanThread::ScanThread(const wxString& what, int type, wxServDisc *parent)
-  : wxThread()
-{
-  p = parent;
-  w = what;
-  t = type;
-}
-
-
-
-void* ScanThread::Entry()
+wxThread::ExitCode wxServDisc::Entry()
 {
   mdnsd d;
   struct message m;
@@ -121,12 +77,12 @@ void* ScanThread::Entry()
 
   if((s = msock()) < 0) 
     { 
-      p->err.Printf(_("Can't create socket: %s\n"), strerror(errno));
+      err.Printf(_("Can't create socket: %s\n"), strerror(errno));
       exit = true;
     }
 
   // register query(w,t) at mdnsd d, submit our address for callback ans()
-  mdnsd_query(d, w.char_str(), t, ans, this);
+  mdnsd_query(d, query.char_str(), querytype, ans, this);
 
 
 #ifdef __WXGTK__
@@ -140,18 +96,18 @@ void* ScanThread::Entry()
 #endif
 
 
-  while(!TestDestroy() && !exit)
+  while(!GetThread()->TestDestroy() && !exit)
     {
       tv = mdnsd_sleep(d);
     
       long msecs = tv->tv_sec == 0 ? 100 : tv->tv_sec*1000; // so that the while loop beneath gets executed once
-      wxLogDebug(wxT("wxServDisc %p: scanthread waiting for data, timeout %i seconds"), p, tv->tv_sec);
+      wxLogDebug(wxT("wxServDisc %p: scanthread waiting for data, timeout %i seconds"), this, tv->tv_sec);
 
 
       // we split the one select() call into several ones every 100ms
       // to be able to catch TestDestroy()...
       int datatoread = 0;
-      while(msecs > 0 && !TestDestroy() && !datatoread)
+      while(msecs > 0 && !GetThread()->TestDestroy() && !datatoread)
 	{
 	  // the select call leaves tv undefined, so re-set
 	  tv->tv_sec = 0;
@@ -177,7 +133,7 @@ void* ScanThread::Entry()
 	}
       
       wxLogDebug(wxT("wxServDisc %p: scanthread woke up, reason: incoming data(%i), timeout(%i), error(%i), deletion(%i)"),
-		 p, datatoread>0, msecs<=0, datatoread==-1, TestDestroy() );
+		 this, datatoread>0, msecs<=0, datatoread==-1, GetThread()->TestDestroy() );
 
       // receive
       if(FD_ISSET(s,&fds))
@@ -198,13 +154,15 @@ void* ScanThread::Entry()
   mdnsd_shutdown(d);
   mdnsd_free(d);
 
+  wxLogDebug(wxT("wxServDisc %p: scanthread exiting"), this);
+
   return NULL;
 }
 
 
 
 
-bool ScanThread::sendm(struct message* m, SOCKET s, unsigned long int ip, unsigned short int port)
+bool wxServDisc::sendm(struct message* m, SOCKET s, unsigned long int ip, unsigned short int port)
 {
   struct sockaddr_in to;
  
@@ -216,7 +174,7 @@ bool ScanThread::sendm(struct message* m, SOCKET s, unsigned long int ip, unsign
 
   if(sendto(s, (char*)message_packet(m), message_packet_len(m), 0,(struct sockaddr *)&to,sizeof(struct sockaddr_in)) != message_packet_len(m))  
     { 
-      p->err.Printf(_("Can't write to socket: %s\n"),strerror(errno));
+      err.Printf(_("Can't write to socket: %s\n"),strerror(errno));
       return false;
     }
 
@@ -227,7 +185,7 @@ bool ScanThread::sendm(struct message* m, SOCKET s, unsigned long int ip, unsign
 
 
 
-int ScanThread::recvm(struct message* m, SOCKET s, unsigned long int *ip, unsigned short int *port) 
+int wxServDisc::recvm(struct message* m, SOCKET s, unsigned long int *ip, unsigned short int *port) 
 {
   struct sockaddr_in from;
   int bsize;
@@ -254,7 +212,7 @@ int ScanThread::recvm(struct message* m, SOCKET s, unsigned long int *ip, unsign
     if(bsize < 0 && errno != EAGAIN)
 #endif
       {
-	p->err.Printf(_("Can't read from socket %d: %s\n"),
+	err.Printf(_("Can't read from socket %d: %s\n"),
 		      errno,strerror(errno));
 	return bsize;
       }
@@ -266,13 +224,10 @@ int ScanThread::recvm(struct message* m, SOCKET s, unsigned long int *ip, unsign
 
 
 
-
-
-int ScanThread::ans(mdnsda a, void *arg)
+int wxServDisc::ans(mdnsda a, void *arg)
 {
-  ScanThread *moi = (ScanThread*)arg;
+  wxServDisc *moi = (wxServDisc*)arg;
   
-
   wxString key;
   switch(a->type)
     {
@@ -305,20 +260,20 @@ int ScanThread::ans(mdnsda a, void *arg)
 
   if(a->ttl == 0)
     // entry was expired
-    moi->p->results.erase(key);
+    moi->results.erase(key);
   else
     // entry update
-    moi->p->results[key] = result;
+    moi->results[key] = result;
 
-  moi->p->SendNotify();
+  moi->SendNotify();
     
   
-  wxLogDebug(wxT("wxServDisc %p: got answer:"), moi->p);
-  wxLogDebug(wxT("wxServDisc %p:    key:  %s"), moi->p, key.c_str());
-  wxLogDebug(wxT("wxServDisc %p:    name: %s"), moi->p, moi->p->results[key].name.c_str());
-  wxLogDebug(wxT("wxServDisc %p:    ip:   %s"), moi->p, moi->p->results[key].ip.c_str());
-  wxLogDebug(wxT("wxServDisc %p:    port: %u"), moi->p, moi->p->results[key].port);
-  wxLogDebug(wxT("wxServDisc %p: answer end"), moi->p);
+  wxLogDebug(wxT("wxServDisc %p: got answer:"), moi);
+  wxLogDebug(wxT("wxServDisc %p:    key:  %s"), moi, key.c_str());
+  wxLogDebug(wxT("wxServDisc %p:    name: %s"), moi, moi->results[key].name.c_str());
+  wxLogDebug(wxT("wxServDisc %p:    ip:   %s"), moi, moi->results[key].ip.c_str());
+  wxLogDebug(wxT("wxServDisc %p:    port: %u"), moi, moi->results[key].port);
+  wxLogDebug(wxT("wxServDisc %p: answer end"),  moi);
   
   return 1;
 }
@@ -328,7 +283,7 @@ int ScanThread::ans(mdnsda a, void *arg)
 // create a multicast 224.0.0.251:5353 socket,
 // aproppriate for receiving and sending,
 // windows or unix style
-SOCKET ScanThread::msock() const
+SOCKET wxServDisc::msock() const
 {
   SOCKET s;
   int flag = 1;
@@ -402,20 +357,8 @@ SOCKET ScanThread::msock() const
 
 
 
-
-void ScanThread::OnExit()
-{
-  wxLogDebug(wxT("wxServDisc %p: scanthread querying '%s' exiting"), p, w.c_str());
-  p->scanthread = 0;
-}
-
-
-
-
-
-
 /*
-  wxServDisc class
+  public member functions
 
 */
 
@@ -427,20 +370,17 @@ wxServDisc::wxServDisc(void* p, const wxString& what, int type)
 
   // save query
   query = what;
+  querytype = type;
 
   wxLogDebug(wxT(""));
   wxLogDebug(wxT("wxServDisc %p: about to query '%s'"), this, query.c_str());
 
-  ScanThread *st_ptr = new ScanThread(what, type, this);
-
-  // save it for later on
-  scanthread = st_ptr;
-  
-  if( st_ptr->Create() != wxTHREAD_NO_ERROR )
-    err.Printf(_("Can't create scan thread!"));
-
-  if( st_ptr->Run() != wxTHREAD_NO_ERROR )
-    err.Printf(_("Can't start scan thread!")); 
+    
+  if( Create() != wxTHREAD_NO_ERROR )
+    err.Printf(_("Could not create scan thread!"));
+  else
+    if( GetThread()->Run() != wxTHREAD_NO_ERROR )
+      err.Printf(_("Could not start scan thread!")); 
 }
 
 
@@ -448,11 +388,9 @@ wxServDisc::wxServDisc(void* p, const wxString& what, int type)
 wxServDisc::~wxServDisc()
 {
   wxLogDebug(wxT("wxServDisc %p: before scanthread delete"), this);
-  static_cast<ScanThread*>(scanthread)->Delete();
-  // wait for deletion to finish
-  while(scanthread)
-    wxMilliSleep(100);
-
+  GetThread()->Delete(); // this makes TestDestroy() return true
+  GetThread()->Wait();   // this frees the threads system resources
+  
   wxLogDebug(wxT("wxServDisc %p: scanthread deleted, wxServDisc destroyed, query was '%s'"), this, query.c_str());
   wxLogDebug(wxT("")); 
 }
