@@ -56,4 +56,12 @@ appbundle: src/sdwrap
 endif
 
 
+if MINGW
+nsis_installer: all sdwrap.nsi README NEWS COPYING
+	cat README | unix2dos > README.TXT
+	cat NEWS | unix2dos > NEWS.TXT
+	cat COPYING | unix2dos > COPYING.TXT
+	$(STRIP) src/sdwrap.exe
+	makensis sdwrap.nsi 
+endif
 
