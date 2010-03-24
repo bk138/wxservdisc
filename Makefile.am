@@ -5,13 +5,11 @@ SUBDIRS = \
 	src
 
 
-sdwrapdocdir = ${prefix}/doc/sdwrap
+sdwrapdocdir = ${prefix}/share/doc/sdwrap
 sdwrapdoc_DATA = \
 	README\
-	COPYING\
 	AUTHORS\
 	ChangeLog\
-	INSTALL\
 	NEWS
 
 EXTRA_DIST = $(sdwrapdoc_DATA)

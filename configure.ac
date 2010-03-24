@@ -73,6 +73,7 @@ if test "$HOST_IS_DARWIN" = "yes"; then
      CC="gcc -arch i386 -arch ppc"
      CXX="g++ -arch i386 -arch ppc"
      CPP="cpp"
+     CXXCPP="cpp"
      AC_MSG_RESULT([yes])
    else
      AC_MSG_RESULT([no])
