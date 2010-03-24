@@ -1,0 +1,11 @@
+
+wxServDisc 0.3
+   * Now closes sockets properly.
+   * Some more code cleanups.
+
+wxServDisc 0.2
+   * Lookups should now be faster.
+   * Some cleanups.
+
+wxServDisc 0.1
+   * Initial public release.
