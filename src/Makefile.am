@@ -38,7 +38,7 @@ endif
 sdwrap_LDFLAGS = 
 
 sdwrap_LDADD = \
-	wxServDisc/libwxservdisc.a \
+	wxServDisc/libwxservdisc.la \
 	$(WX_LIBS)
 
 
