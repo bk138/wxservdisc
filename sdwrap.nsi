@@ -1,4 +1,4 @@
-!define VERSION "0.2"
+!define VERSION "0.3"
 
 Name "SDWrap ${VERSION}"
 
