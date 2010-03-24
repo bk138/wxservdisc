@@ -26,7 +26,14 @@ sdwrap_SOURCES = \
 	gui/DialogSettings.cpp \
 	gui/DialogSettings.h \
 	gui/MyDialogSettings.cpp \
-	gui/MyDialogSettings.h 
+	gui/MyDialogSettings.h \
+	gui/bitmapFromMem.h\
+	gui/res/about.png.h \
+	gui/res/add.png.h \
+	gui/res/info.png.h \
+	gui/res/remove.png.h \
+	gui/res/icon.xpm 
+
 
 if MINGW
 sdwrap_SOURCES += gui/winres.rc
