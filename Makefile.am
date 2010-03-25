@@ -5,7 +5,7 @@ SUBDIRS = \
 	src
 
 
-sdwrapdocdir = ${prefix}/share/doc/sdwrap
+sdwrapdocdir = ${datadir}/doc/sdwrap
 sdwrapdoc_DATA = \
 	README\
 	AUTHORS\
