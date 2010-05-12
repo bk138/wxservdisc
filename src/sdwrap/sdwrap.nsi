@@ -19,7 +19,6 @@ Section ""
 
   File src\SDWrap.exe
   File src\mingwm10.dll
-  File NEWS.TXT	
   File README.TXT
 
   writeUninstaller $INSTDIR\SDWrap-uninstall.exe
@@ -28,7 +27,6 @@ Section ""
   CreateDirectory "$SMPROGRAMS\SDWrap"
   createShortCut  "$SMPROGRAMS\SDWrap\SDWrap.lnk" "$INSTDIR\SDWrap.exe"
   createShortCut  "$SMPROGRAMS\SDWrap\Readme.lnk" "$INSTDIR\README.TXT"
-  createShortCut  "$SMPROGRAMS\SDWrap\News.lnk" "$INSTDIR\NEWS.TXT"
   createShortCut  "$SMPROGRAMS\SDWrap\Uninstall SDWrap.lnk" "$INSTDIR\SDWrap-uninstall.exe"
 
 SectionEnd 

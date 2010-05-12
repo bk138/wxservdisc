@@ -5,24 +5,24 @@ SUBDIRS = \
 	src
 
 
-sdwrapdocdir = ${datadir}/doc/sdwrap
-sdwrapdoc_DATA = \
+wxservdiscdocdir = ${datadir}/doc/wxservdisc
+wxservdiscdoc_DATA = \
 	README\
 	AUTHORS\
 	ChangeLog\
 	NEWS
 
-EXTRA_DIST = $(sdwrapdoc_DATA)
+EXTRA_DIST = $(wxservdiscdoc_DATA)
 
 
 if DARWIN
-bundle_contents = SDWrap.app/Contents
-appbundle: src/sdwrap
+bundle_contents = wxservdisc.app/Contents
+appbundle: src/wxservdisc/libwxservdisc.a src/wxservdisc/libwxservdisc.so
 	mkdir -p $(bundle_contents)/MacOS
 	mkdir -p $(bundle_contents)/Resources
 	echo "APPL????" > $(bundle_contents)/PkgInfo
 	$(INSTALL_PROGRAM) $< $(bundle_contents)/MacOS/
-	cp src/gui/res/icon.icns $(bundle_contents)/Resources
+	cp src/wxServDisc/res/icon.icns $(bundle_contents)/Resources
 	cp README  $(bundle_contents)/Resources
 	cp NEWS    $(bundle_contents)/Resources
 	cp COPYING $(bundle_contents)/Resources
@@ -39,9 +39,9 @@ appbundle: src/sdwrap
 	<key>CFBundleIconFile</key>\
 	<string>icon.icns</string>\
 	<key>CFBundleGetInfoString</key>\
-	<string>SDWrap @PACKAGE_VERSION@, © Christian Beier (dontmind@freeshell.org), 2008-2010 </string>\
+	<string>wxServDisc @PACKAGE_VERSION@, © Christian Beier (dontmind@freeshell.org), 2008-2010 </string>\
 	<key>CFBundleName</key>  \
-	<string>SDWrap</string> \
+	<string>wxServDisc</string> \
 	<key>CFBundlePackageType</key> \
 	<string>APPL</string>          \
 	<key>CFBundleShortVersionString</key> \
@@ -55,11 +55,10 @@ endif
 
 
 if MINGW
-nsis_installer: all sdwrap.nsi README NEWS COPYING
+nsis_installer: all wxServDisc.nsi README NEWS COPYING
 	cat README | unix2dos > README.TXT
 	cat NEWS | unix2dos > NEWS.TXT
 	cat COPYING | unix2dos > COPYING.TXT
-	$(STRIP) src/sdwrap.exe
-	makensis sdwrap.nsi 
+	makensis wxServDisc.nsi 
 endif
 

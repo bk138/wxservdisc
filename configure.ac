@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Created by Anjuta application wizard.
 
-AC_INIT(sdwrap, 0.3)
+AC_INIT(wxServDisc, 0.3)
 
 
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
@@ -107,4 +107,5 @@ AC_OUTPUT([
 Makefile
 src/Makefile
 src/wxServDisc/Makefile
+src/sdwrap/Makefile
 ])
