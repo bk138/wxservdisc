@@ -1,15 +1,50 @@
-Source: sdwrap
-Section: net
+Source: libwxservdisc
+Section: libs
 Priority: extra
 Maintainer: Christian Beier <dontmind@freeshell.org>
-Build-Depends: debhelper (>= 7), autotools-dev, libwxgtk2.8-dev
+Build-Depends: debhelper (>= 7), autotools-dev, libtool, dpkg-dev (>= 1.13.19), libwxgtk2.8-dev
 Standards-Version: 3.7.3
-Homepage: http://sourceforge.net/projects/sdwrap/
+Homepage: http://sourceforge.net/projects/wxservdisc/
 
-Package: sdwrap
+Package: libwxservdisc
+Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
+Description: wxWidgets Zeroconf service discovery library
+ A simple Zeroconf service discovery library for wxWidgets applications.
+ .
+ This package contains the shared library.
+
+Package: libwxservdisc-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends}, libwxservdisc (= ${binary:Version})
+Description: Development files for the libwxservdisc library
+ A simple Zeroconf service discovery library for wxWidgets applications.
+ .
+ This package is needed to compile programs against libwxservdisc.
+ It contains the header files and static libraries (optionally)
+ needed for compiling.
+
+Package: libwxservdisc-dbg
+Section: libdevel
+Priority: extra
+Architecture: any
+Depends: ${misc:Depends}, libwxservdisc (= ${binary:Version})
+Description: Debugging symbols for the libwxservdisc library
+ A simple Zeroconf service discovery library for wxWidgets applications.
+ .
+ This package contains the debugging symbols associated with
+ libwxservdisc. They will automatically be used by gdb for debugging
+ libwxservdisc-related issues.
+
+Package: sdwrap
+Section: net
+Architecture: any
+Depends: ${shlibs:Depends}
 Description: Zeroconf service discovery wrapper using wxServDisc
  Simple wrapper app to execute some command with Zeroconf supplied
  addresses and ports. Uses wxServDisc for service discovery.
+
+
 
