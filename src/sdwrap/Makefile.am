@@ -89,8 +89,8 @@ endif
 if MINGW
 nsis_installer: all sdwrap.nsi README
 	cat README | unix2dos > README.TXT
-	cat ../NEWS | unix2dos > NEWS.TXT
-	cat ../COPYING | unix2dos > COPYING.TXT
+	cat ../../NEWS | unix2dos > NEWS.TXT
+	cat ../../COPYING | unix2dos > COPYING.TXT
 	$(STRIP) sdwrap.exe
 	makensis sdwrap.nsi 
 endif

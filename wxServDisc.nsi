@@ -17,8 +17,9 @@ Section ""
 
   SetOutPath $INSTDIR
 
-  File src\wxServDisc\wxServDisc.dll
-  File src\wxServDisc\wxServDisc.a
+  #  dll not built by now
+  #  File src\wxServDisc\wxServDisc.dll
+  File src\wxServDisc\libwxServDisc.a
   File README.TXT
 
   writeUninstaller $INSTDIR\wxServDisc-uninstall.exe

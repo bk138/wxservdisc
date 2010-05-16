@@ -38,6 +38,30 @@ so you have to add it to your event table, if you want to use it:
 
 wxServDisc uses mdnsd (C) Jer <jer@jabber.org> internally. 
 
+
+
+
+BUILDING:
+
+
+prerequisites:  wxWidgets 2.8
+
+   ./configure && make 
+   
+
+       OR (when building for Win32 with mingw):
+
+   ./configure --build=<your build target name> --host=i586-mingw32msvc \
+               --with-wx-config=<your win32 wx-config>  && make
+
+
+       OR (when building under OS X):
+       
+   ./configure && make && make appbundle
+
+
+
+
 that's it, have fun!
 
    christian beier <dontmind@freeshell.org>

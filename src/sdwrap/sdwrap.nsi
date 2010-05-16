@@ -17,8 +17,8 @@ Section ""
 
   SetOutPath $INSTDIR
 
-  File src\SDWrap.exe
-  File src\mingwm10.dll
+  File SDWrap.exe
+  File mingwm10.dll
   File README.TXT
 
   writeUninstaller $INSTDIR\SDWrap-uninstall.exe
