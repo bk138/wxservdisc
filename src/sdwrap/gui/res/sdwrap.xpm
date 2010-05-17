@@ -1,5 +1,5 @@
 /* XPM */
-static const char *icon_xpm[] = {
+static const char *sdwrap_xpm[] = {
 /* columns rows colors chars-per-pixel */
 "48 48 225 2",
 "   c black",
