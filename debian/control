@@ -45,6 +45,3 @@ Depends: ${shlibs:Depends}
 Description: Zeroconf service discovery wrapper using wxServDisc
  Simple wrapper app to execute some command with Zeroconf supplied
  addresses and ports. Uses wxServDisc for service discovery.
-
-
-
