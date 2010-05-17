@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Exec=sdwrap
+Icon=sdwrap
+Name=SDWrap
+Type=Application
+Comment=A Zeroconf service discovery wrapper
+Terminal=false
+StartupNotify=false
+Categories=Application;Network;
+

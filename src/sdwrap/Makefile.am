@@ -10,6 +10,17 @@ AM_CFLAGS =\
 	 -g \
 	 $(WX_CPPFLAGS)
 
+Applicationsdir = $(datadir)/applications/
+Applications_DATA = sdwrap.desktop
+
+pixmapdir = $(datadir)/pixmaps
+pixmap_DATA = gui/res/sdwrap.xpm
+
+
+EXTRA_DIST = $(Applications_DATA) \
+             $(pixmap_DATA)
+
+
 bin_PROGRAMS = sdwrap
 
 sdwrap_SOURCES = \
@@ -29,7 +40,7 @@ sdwrap_SOURCES = \
 	gui/res/add.png.h \
 	gui/res/info.png.h \
 	gui/res/remove.png.h \
-	gui/res/icon.xpm 
+	gui/res/sdwrap.xpm 
 
 
 if MINGW
@@ -55,9 +66,9 @@ appbundle: sdwrap
 	$(INSTALL_PROGRAM) $< $(bundle_contents)/MacOS/
 	cp gui/res/icon.icns $(bundle_contents)/Resources
 	cp README  $(bundle_contents)/Resources
-	cp ../NEWS    $(bundle_contents)/Resources
-	cp ../COPYING $(bundle_contents)/Resources
-	cp ../AUTHORS $(bundle_contents)/Resources
+	cp ../../NEWS    $(bundle_contents)/Resources
+	cp ../../COPYING $(bundle_contents)/Resources
+	cp ../../AUTHORS $(bundle_contents)/Resources
 	echo \
 	"<?xml version="1.0" encoding="UTF-8"?>\
 	<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"\
