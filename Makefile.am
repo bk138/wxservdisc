@@ -16,41 +16,44 @@ EXTRA_DIST = $(wxservdiscdoc_DATA)
 
 
 if DARWIN
-bundle_contents = wxservdisc.app/Contents
-appbundle: src/wxservdisc/libwxservdisc.a src/wxservdisc/libwxservdisc.so
-	mkdir -p $(bundle_contents)/MacOS
-	mkdir -p $(bundle_contents)/Resources
-	echo "APPL????" > $(bundle_contents)/PkgInfo
-	$(INSTALL_PROGRAM) $< $(bundle_contents)/MacOS/
-	cp src/wxServDisc/res/icon.icns $(bundle_contents)/Resources
-	cp README  $(bundle_contents)/Resources
-	cp NEWS    $(bundle_contents)/Resources
-	cp COPYING $(bundle_contents)/Resources
-	cp AUTHORS $(bundle_contents)/Resources
+bundle_contents = wxServDisc.framework
+framework: src/wxServDisc/.libs/libwxservdisc.0.@PACKAGE_VERSION@.dylib.dSYM src/wxServDisc/.libs/libwxservdisc.a
+	mkdir -p $(bundle_contents)/Versions/@PACKAGE_VERSION@
+	ln -fs @PACKAGE_VERSION@ $(bundle_contents)/Versions/Current
+	cp src/wxServDisc/.libs/libwxservdisc.a $(bundle_contents)/Versions/Current/wxServDisc
+	ln -fs Versions/Current/wxServDisc  $(bundle_contents)/wxServDisc
+	mkdir -p  $(bundle_contents)/Versions/Current/Libraries
+	ln -fs Versions/Current/Libraries $(bundle_contents)/Libraries
+	cp -a src/wxServDisc/.libs/libwxservdisc.0.@PACKAGE_VERSION@.dylib.dSYM  $(bundle_contents)/Libraries/
+	mkdir  $(bundle_contents)/Versions/Current/Resources
+	ln -fs Versions/Current/Resources $(bundle_contents)/Resources
+	mkdir -p  $(bundle_contents)/Versions/Current/Headers
+	ln -fs Versions/Current/Headers  $(bundle_contents)/Headers
+	cp src/wxServDisc/wxServDisc.h  $(bundle_contents)/Versions/Current/Headers/
+	mkdir -p  $(bundle_contents)/Versions/Current/Documentation
+	ln -fs Versions/Current/Documentation  $(bundle_contents)/Documentation
+	cp README  $(bundle_contents)/Documentation/
+	cp NEWS    $(bundle_contents)/Documentation/
+	cp COPYING $(bundle_contents)/Documentation/
+	cp AUTHORS $(bundle_contents)/Documentation/
 	echo \
 	"<?xml version="1.0" encoding="UTF-8"?>\
 	<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"\
 	<plist version="1.0">\
 	<dict>\
-	<key>CFBundleDevelopmentRegion</key>\
-	<string>English</string>\
-	<key>CFBundleExecutable</key>\
-	<string>@PACKAGE_NAME@</string>\
-	<key>CFBundleIconFile</key>\
-	<string>icon.icns</string>\
 	<key>CFBundleGetInfoString</key>\
-	<string>wxServDisc @PACKAGE_VERSION@, © Christian Beier (dontmind@freeshell.org), 2008-2010 </string>\
+	<string>wxServDisc Framework @PACKAGE_VERSION@, © Christian Beier (dontmind@freeshell.org), 2008-2010 </string>\
 	<key>CFBundleName</key>  \
 	<string>wxServDisc</string> \
 	<key>CFBundlePackageType</key> \
-	<string>APPL</string>          \
+	<string>FMWK</string>          \
 	<key>CFBundleShortVersionString</key> \
 	<string>@PACKAGE_VERSION@</string> \
 	<key>CFBundleVersion</key> \
 	<string>@PACKAGE_VERSION@</string> \
 	</dict>   \
 	</plist> \
-	" >  $(bundle_contents)/Info.plist
+	" > $(bundle_contents)/Versions/Current/Resources/Info.plist
 endif
 
 

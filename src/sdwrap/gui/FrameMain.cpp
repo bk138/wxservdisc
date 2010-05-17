@@ -117,7 +117,7 @@ void FrameMain::set_properties()
     // begin wxGlade: FrameMain::set_properties
     SetTitle(_("Service Discovery"));
     wxIcon _icon;
-    _icon.CopyFromBitmap(wxICON(icon));
+    _icon.CopyFromBitmap(wxICON(sdwrap));
     SetIcon(_icon);
     int frame_main_statusbar_widths[] = { -1 };
     frame_main_statusbar->SetStatusWidths(1, frame_main_statusbar_widths);

@@ -40,7 +40,8 @@ sdwrap_SOURCES = \
 	gui/res/add.png.h \
 	gui/res/info.png.h \
 	gui/res/remove.png.h \
-	gui/res/sdwrap.xpm 
+	gui/res/sdwrap.xpm \
+	gui/res/icon.icns
 
 
 if MINGW
