@@ -17,14 +17,14 @@ EXTRA_DIST = $(wxservdiscdoc_DATA)
 
 if DARWIN
 bundle_contents = wxServDisc.framework
-framework: src/wxServDisc/.libs/libwxservdisc.0.@PACKAGE_VERSION@.dylib.dSYM src/wxServDisc/.libs/libwxservdisc.a
+framework: src/wxServDisc/.libs/libwxservdisc.0.dylib.dSYM src/wxServDisc/.libs/libwxservdisc.a
 	mkdir -p $(bundle_contents)/Versions/@PACKAGE_VERSION@
 	ln -fs @PACKAGE_VERSION@ $(bundle_contents)/Versions/Current
 	cp src/wxServDisc/.libs/libwxservdisc.a $(bundle_contents)/Versions/Current/wxServDisc
 	ln -fs Versions/Current/wxServDisc  $(bundle_contents)/wxServDisc
 	mkdir -p  $(bundle_contents)/Versions/Current/Libraries
 	ln -fs Versions/Current/Libraries $(bundle_contents)/Libraries
-	cp -a src/wxServDisc/.libs/libwxservdisc.0.@PACKAGE_VERSION@.dylib.dSYM  $(bundle_contents)/Libraries/
+	cp -a src/wxServDisc/.libs/libwxservdisc.0.dylib.dSYM  $(bundle_contents)/Libraries/
 	mkdir  $(bundle_contents)/Versions/Current/Resources
 	ln -fs Versions/Current/Resources $(bundle_contents)/Resources
 	mkdir -p  $(bundle_contents)/Versions/Current/Headers
