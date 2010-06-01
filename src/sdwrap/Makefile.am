@@ -64,7 +64,7 @@ appbundle: sdwrap
 	mkdir -p $(bundle_contents)/MacOS
 	mkdir -p $(bundle_contents)/Resources
 	echo "APPL????" > $(bundle_contents)/PkgInfo
-	$(INSTALL_PROGRAM) $< $(bundle_contents)/MacOS/
+	$(LIBTOOL) --mode install $(INSTALL_PROGRAM) $< $(CURDIR)/$(bundle_contents)/MacOS/
 	cp gui/res/icon.icns $(bundle_contents)/Resources
 	cp README  $(bundle_contents)/Resources
 	cp ../../NEWS    $(bundle_contents)/Resources
@@ -78,7 +78,7 @@ appbundle: sdwrap
 	<key>CFBundleDevelopmentRegion</key>\
 	<string>English</string>\
 	<key>CFBundleExecutable</key>\
-	<string>@PACKAGE_NAME@</string>\
+	<string>sdwrap</string>\
 	<key>CFBundleIconFile</key>\
 	<string>icon.icns</string>\
 	<key>CFBundleGetInfoString</key>\
