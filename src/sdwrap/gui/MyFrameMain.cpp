@@ -356,6 +356,8 @@ void MyFrameMain::edit_preferences(wxCommandEvent &event)
 
       read_config();
 
+      list_box_services->Clear();
+
       delete servscan;
       servscan = new wxServDisc(this, servicestring, QTYPE_PTR);
     }
