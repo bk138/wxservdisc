@@ -42,7 +42,12 @@ typedef int SOCKET;
 
 
 // make available custom notify event if getResults() would yield sth new
-DECLARE_EVENT_TYPE(wxServDiscNOTIFY, -1)
+#if wxVERSION_NUMBER < 2900
+DECLARE_EVENT_TYPE(wxServDiscNOTIFY, -1);
+#else
+wxDECLARE_EVENT(wxServDiscNOTIFY, wxCommandEvent);
+#endif
+
 
 
 
