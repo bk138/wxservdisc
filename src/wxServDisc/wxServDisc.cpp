@@ -105,7 +105,7 @@ wxThread::ExitCode wxServDisc::Entry()
       tv = mdnsd_sleep(d);
     
       long msecs = tv->tv_sec == 0 ? 100 : tv->tv_sec*1000; // so that the while loop beneath gets executed once
-      wxLogDebug(wxT("wxServDisc %p: scanthread waiting for data, timeout %i seconds"), this, tv->tv_sec);
+      wxLogDebug(wxT("wxServDisc %p: scanthread waiting for data, timeout %i seconds"), this, (int)tv->tv_sec);
 
 
       // we split the one select() call into several ones every 100ms
