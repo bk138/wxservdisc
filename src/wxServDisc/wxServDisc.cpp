@@ -391,8 +391,11 @@ wxServDisc::wxServDisc(void* p, const wxString& what, int type)
   wxLogDebug(wxT(""));
   wxLogDebug(wxT("wxServDisc %p: about to query '%s'"), this, query.c_str());
 
-    
+#if wxVERSION_NUMBER >= 2900    
+  if( CreateThread(wxTHREAD_DETACHED) != wxTHREAD_NO_ERROR )
+#else
   if( Create() != wxTHREAD_NO_ERROR )
+#endif
     err.Printf(_("Could not create scan thread!"));
   else
     if( GetThread()->Run() != wxTHREAD_NO_ERROR )
