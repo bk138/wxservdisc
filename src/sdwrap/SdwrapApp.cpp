@@ -87,7 +87,7 @@ bool SdwrapApp::setLocale(int language)
 
   // don't use wxLOCALE_LOAD_DEFAULT flag so that Init() doesn't return 
   // false just because it failed to load wxstd catalog                                 
-  if(! locale->Init(language, wxLOCALE_CONV_ENCODING) )                      
+  if(! locale->Init(language, 0) )                      
     {  
       wxLogError(_("This language is not supported by the system.")); 
       return false;    
@@ -96,7 +96,7 @@ bool SdwrapApp::setLocale(int language)
 
   // don't use wxLOCALE_LOAD_DEFAULT flag so that Init() doesn't return 
   // false just because it failed to load wxstd catalog                                 
-  if(! locale->Init(language, wxLOCALE_CONV_ENCODING) )                      
+  if(! locale->Init(language, 0) )                      
     {  
       wxLogError(_("This language is not supported by the system.")); 
       return false;    
