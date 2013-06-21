@@ -7,7 +7,9 @@ include_HEADERS = wxServDisc.h
 libwxservdisc_la_CPPFLAGS = @WX_CPPFLAGS@
 libwxservdisc_la_LDFLAGS = -no-undefined -version-info 0:3:0
 libwxservdisc_la_LIBADD = $(WX_LIBS)
-
+if MINGW
+libwxservdisc_la_LIBADD += -lws2_32
+endif
 
 
 
