@@ -286,9 +286,12 @@ int wxServDisc::ans(mdnsda a, void *arg)
   
   wxLogDebug(wxT("wxServDisc %p: got answer:"), moi);
   wxLogDebug(wxT("wxServDisc %p:    key:  %s"), moi, key.c_str());
-  wxLogDebug(wxT("wxServDisc %p:    name: %s"), moi, moi->results[key].name.c_str());
-  wxLogDebug(wxT("wxServDisc %p:    ip:   %s"), moi, moi->results[key].ip.c_str());
-  wxLogDebug(wxT("wxServDisc %p:    port: %u"), moi, moi->results[key].port);
+  wxLogDebug(wxT("wxServDisc %p:    ttl:  %i"), moi, (int)a->ttl);
+  if(a->ttl != 0) {
+    wxLogDebug(wxT("wxServDisc %p:    name: %s"), moi, moi->results[key].name.c_str());
+    wxLogDebug(wxT("wxServDisc %p:    ip:   %s"), moi, moi->results[key].ip.c_str());
+    wxLogDebug(wxT("wxServDisc %p:    port: %u"), moi, moi->results[key].port);
+  }
   wxLogDebug(wxT("wxServDisc %p: answer end"),  moi);
   
   return 1;
