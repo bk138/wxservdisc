@@ -187,7 +187,7 @@ bool MyFrameMain::spawn_client()
   client_proc = new MyProcess(this, cmd, &MyFrameMain::on_client_term);
   client_pid = wxExecute(cmd, wxEXEC_ASYNC|wxEXEC_MAKE_GROUP_LEADER, client_proc);
   
-  wxLogDebug(wxT("SDWrap: spawn_client() spawned '%i'"), client_pid);
+  wxLogDebug(wxT("SDWrap: spawn_client() spawned '%l'"), client_pid);
  
   if ( !client_pid )
     {
@@ -221,12 +221,12 @@ void MyFrameMain::kill_client()
       }
      
 
-  wxLogDebug(wxT("SDWrap: kill_client() tries to kill '%i'"), client_pid);
+  wxLogDebug(wxT("SDWrap: kill_client() tries to kill '%l'"), client_pid);
 
   if(client_pid)
     if(wxKill(client_pid, wxSIGTERM, NULL, wxKILL_CHILDREN) == 0)
       {
-	wxLogDebug(wxT("SDWrap: kill_client() zeros '%i'"), client_pid);
+	wxLogDebug(wxT("SDWrap: kill_client() zeros '%l'"), client_pid);
 	client_pid = 0;
 	  
 	// this is "share window"
@@ -241,7 +241,7 @@ void MyFrameMain::kill_client()
 
 void MyFrameMain::on_client_term(wxString& cmd, int status)
 {
-  wxLogDebug(wxT("SDWrap: on_client_term() zeros '%i'"), client_pid);
+  wxLogDebug(wxT("SDWrap: on_client_term() zeros '%l'"), client_pid);
 
    if(status == 0) 
     SetStatusText(_("Client terminated gracefully."));
