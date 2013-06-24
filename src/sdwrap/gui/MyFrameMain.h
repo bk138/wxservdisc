@@ -52,7 +52,7 @@ class MyFrameMain: public FrameMain
   
   // the client command to be executed and its process id
   wxString client_cmd_template;
-  long client_pid;
+  int client_pid;
   MyProcess *client_proc;
   bool spawn_client();
   void kill_client();
