@@ -3,9 +3,9 @@
 
 
 AM_CPPFLAGS = \
-	$(WX_CXXFLAGS)
+	$(WX_CPPFLAGS)
 
-AM_CFLAGS =\
+AM_CXXFLAGS =\
 	 -Wall \
 	 -g \
 	 $(WX_CPPFLAGS)
