@@ -34,7 +34,7 @@
 
 
 #define VERSION "0.3"
-#define COPYRIGHT "Copyright (C) 2009-2010 Christian Beier <dontmind@freeshell.org>"
+#define COPYRIGHT "Copyright (C) 2009-2013 Christian Beier <dontmind@freeshell.org>"
 
 
 class SdwrapApp: public wxApp 
