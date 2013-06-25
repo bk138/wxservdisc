@@ -86,6 +86,7 @@ wxThread::ExitCode wxServDisc::Entry()
 #endif
     { 
       err.Printf(_("Can't create socket: %s\n"), strerror(errno));
+      wxLogDebug(wxT("ouch, could not create socket!"));
       exit = true;
     }
 
