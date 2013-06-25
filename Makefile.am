@@ -7,7 +7,7 @@ SUBDIRS = \
 
 wxservdiscdocdir = ${datadir}/doc/wxservdisc
 wxservdiscdoc_DATA = \
-	README\
+	README.md\
 	AUTHORS\
 	NEWS
 
@@ -31,7 +31,7 @@ framework: src/wxServDisc/.libs/libwxservdisc.0.dylib.dSYM src/wxServDisc/.libs/
 	cp src/wxServDisc/wxServDisc.h  $(bundle_contents)/Versions/Current/Headers/
 	mkdir -p  $(bundle_contents)/Versions/Current/Documentation
 	ln -fs Versions/Current/Documentation  $(bundle_contents)/Documentation
-	cp README  $(bundle_contents)/Documentation/
+	cp README.md  $(bundle_contents)/Documentation/
 	cp NEWS    $(bundle_contents)/Documentation/
 	cp COPYING $(bundle_contents)/Documentation/
 	cp AUTHORS $(bundle_contents)/Documentation/
@@ -41,7 +41,7 @@ framework: src/wxServDisc/.libs/libwxservdisc.0.dylib.dSYM src/wxServDisc/.libs/
 	<plist version="1.0">\
 	<dict>\
 	<key>CFBundleGetInfoString</key>\
-	<string>wxServDisc Framework @PACKAGE_VERSION@, © Christian Beier (dontmind@freeshell.org), 2008-2010 </string>\
+	<string>wxServDisc Framework @PACKAGE_VERSION@, © Christian Beier (dontmind@freeshell.org), 2008-2013 </string>\
 	<key>CFBundleName</key>  \
 	<string>wxServDisc</string> \
 	<key>CFBundlePackageType</key> \
@@ -57,8 +57,8 @@ endif
 
 
 if MINGW
-nsis_installer: all wxServDisc.nsi README NEWS COPYING
-	cat README | unix2dos > README.TXT
+nsis_installer: all wxServDisc.nsi README.md NEWS COPYING
+	cat README.md | unix2dos > README.TXT
 	cat NEWS | unix2dos > NEWS.TXT
 	cat COPYING | unix2dos > COPYING.TXT
 	makensis wxServDisc.nsi 
