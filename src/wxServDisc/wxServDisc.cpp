@@ -343,8 +343,11 @@ SOCKET wxServDisc::msock()
 #endif
     return -1;
 
-  // set to reuse address
+  // set to reuse address (and maybe port - needed on OSX)
   setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char*)&flag, sizeof(flag));
+#if defined (SO_REUSEPORT)
+  setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, (char*)&flag, sizeof(flag));
+#endif
 
   // Bind socket to port, returns 0 on success
   if(bind(sock, (struct sockaddr*) &addrLocal, sizeof(addrLocal)) != 0) 
