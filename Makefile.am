@@ -9,7 +9,6 @@ wxservdiscdocdir = ${datadir}/doc/wxservdisc
 wxservdiscdoc_DATA = \
 	README\
 	AUTHORS\
-	ChangeLog\
 	NEWS
 
 EXTRA_DIST = $(wxservdiscdoc_DATA)
