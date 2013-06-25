@@ -42,23 +42,26 @@ DIE=0
 }
 
 (grep "^AM_PROG_LIBTOOL" $srcdir/configure.ac >/dev/null) && {
-  (libtool --version) < /dev/null > /dev/null 2>&1 || {
-    echo
-    echo "**Error**: You must have \`libtool' installed."
-    echo "You can get it from: ftp://ftp.gnu.org/pub/gnu/"
-    DIE=1
+  (libtool --version) < /dev/null > /dev/null 2>&1 && {
+      export LIBTOOL=libtool
+      export LIBTOOLIZE=libtoolize
+  } ||
+  {
+    # GNU libtool wasn't found as "libtool",
+    # so we check if it's known as "glibtool" (as on OS X)
+    (glibtool --version) < /dev/null > /dev/null 2>&1 || {
+	echo
+	echo "You must have libtool installed."
+	echo "Download the appropriate package for your distribution,"
+	echo "or see http://www.gnu.org/software/libtool";
+	DIE=1
+    }
+    # These are only used if glibtool is what we want
+    export LIBTOOL=glibtool
+    export LIBTOOLIZE=glibtoolize
   }
 }
 
-(grep "^AM_GLIB_GNU_GETTEXT" $srcdir/configure.ac >/dev/null) && {
-  (grep "sed.*POTFILES" $srcdir/configure.ac) > /dev/null || \
-  (glib-gettextize --version) < /dev/null > /dev/null 2>&1 || {
-    echo
-    echo "**Error**: You must have \`glib' installed."
-    echo "You can get it from: ftp://ftp.gtk.org/pub/gtk"
-    DIE=1
-  }
-}
 
 (automake --version) < /dev/null > /dev/null 2>&1 || {
   echo
@@ -105,14 +108,6 @@ do
 
       aclocalinclude="$ACLOCAL_FLAGS"
 
-      if grep "^AM_GLIB_GNU_GETTEXT" configure.ac >/dev/null; then
-	echo "Creating $dr/aclocal.m4 ..."
-	test -r $dr/aclocal.m4 || touch $dr/aclocal.m4
-	echo "Running glib-gettextize...  Ignore non-fatal messages."
-	echo "no" | glib-gettextize --force --copy
-	echo "Making $dr/aclocal.m4 writable ..."
-	test -r $dr/aclocal.m4 && chmod u+w $dr/aclocal.m4
-      fi
       if grep "^IT_PROG_INTLTOOL" configure.ac >/dev/null; then
         echo "Running intltoolize..."
 	intltoolize --copy --force --automake
@@ -124,7 +119,7 @@ do
       if grep "^AM_PROG_LIBTOOL" configure.ac >/dev/null; then
 	if test -z "$NO_LIBTOOLIZE" ; then 
 	  echo "Running libtoolize..."
-	  libtoolize --force --copy
+	  $LIBTOOLIZE --force --copy
 	fi
       fi
       echo "Running aclocal $aclocalinclude ..."
