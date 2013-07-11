@@ -402,7 +402,7 @@ wxServDisc::wxServDisc(void* p, const wxString& what, int type)
   wxLogDebug(wxT(""));
   wxLogDebug(wxT("wxServDisc %p: about to query '%s'"), this, query.c_str());
 
-#if wxVERSION_NUMBER >= 2950 // 2.9.4 still has a bug here: http://trac.wxwidgets.org/ticket/14626  
+#if wxVERSION_NUMBER >= 2905 // 2.9.4 still has a bug here: http://trac.wxwidgets.org/ticket/14626  
   if( CreateThread(wxTHREAD_DETACHED) != wxTHREAD_NO_ERROR )
 #else
   if( Create() != wxTHREAD_NO_ERROR )
