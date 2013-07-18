@@ -38,10 +38,12 @@
 #include <ws2tcpip.h>
 #else
 // unix socket includes
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/un.h>
+#include <netinet/tcp.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 #endif
 
 #include "wxServDisc.h"
@@ -79,16 +81,10 @@ wxThread::ExitCode wxServDisc::Entry()
 
   d = mdnsd_new(1,1000);
 
-#ifdef __WIN32__
-  if((s = msock()) == INVALID_SOCKET) 
-#else
-  if((s = msock()) < 0) 
-#endif
-    { 
-      err.Printf(_("Can't create socket: %s\n"), strerror(errno));
-      wxLogDebug(wxT("ouch, could not create socket!"));
-      exit = true;
-    }
+  if((s = msock()) < 0) { 
+    wxLogDebug(wxT("Ouch, error creating socket: ") + err);
+    exit = true;
+  }
 
   // register query(w,t) at mdnsd d, submit our address for callback ans()
   mdnsd_query(d, query.char_str(), querytype, ans, this);
@@ -305,68 +301,187 @@ int wxServDisc::ans(mdnsda a, void *arg)
 // windows or unix style
 SOCKET wxServDisc::msock() 
 {
+  int multicastTTL = 255; // multicast TTL, must be 255 for zeroconf!
+  const char* mcAddrStr = "224.0.0.251";
+  const char* mcPortStr = "5353";
+
+
   int flag = 1;
-  int ttl = 255; // multicast TTL, must be 255 for zeroconf!
+  int status;
+  struct addrinfo hints;   // Hints for name lookup
+  struct addrinfo* multicastAddr;  // Multicast address
+  struct addrinfo* localAddr;      // Local address to bind to
 
-  // this is our local address
-  struct sockaddr_in addrLocal;
-  memset(&addrLocal, 0, sizeof(addrLocal));
-  addrLocal.sin_family = AF_INET;
-  addrLocal.sin_port = htons(5353);
-  addrLocal.sin_addr.s_addr = htonl(INADDR_ANY);	
 
-  // and this the multicast destination
-  struct ip_mreq	ipmr;
-  ipmr.imr_multiaddr.s_addr = inet_addr("224.0.0.251");
-  ipmr.imr_interface.s_addr = htonl(INADDR_ANY);
 
+  
+  /* 
+     Resolve the multicast group address 
+  */
+  memset(&hints, 0, sizeof hints); // make sure the struct is empty
+  hints.ai_family = PF_UNSPEC; // IPv4 or IPv6, we don't care
+  hints.ai_flags  = AI_NUMERICHOST;
+  if ((status = getaddrinfo(mcAddrStr, NULL, &hints, &multicastAddr)) != 0) {
+    err.Printf(_("Could not get multicast address: %s\n"), gai_strerror(status));
+    return -1;
+  }
+ 
+  wxLogDebug(wxT("wxServDisc %p: Using %s"), this, multicastAddr->ai_family == PF_INET6 ? "IPv6" : "IPv4");   
+ 
+
+  /* 
+     Resolve a local address with the same family (IPv4 or IPv6) as our multicast group 
+  */
+  memset(&hints, 0, sizeof hints); // make sure the struct is empty
+  hints.ai_family   = multicastAddr->ai_family;
+  hints.ai_socktype = SOCK_DGRAM;
+  hints.ai_flags    = AI_NUMERICHOST|AI_PASSIVE; // no name resolving, wildcard address  
+  if ((status = getaddrinfo(NULL, mcPortStr, &hints, &localAddr)) != 0 ) {
+    err.Printf(_("Could not get local address: %s\n"), gai_strerror(status));
+    freeaddrinfo(multicastAddr);
+    return -1;
+  }
+   
+
+
+  /*
+    Start up WinSock
+   */
 #ifdef __WIN32__
-  // winsock startup
   WORD		wVersionRequested;
   WSADATA	wsaData;
   wVersionRequested = MAKEWORD(2, 2);
   if(WSAStartup(wVersionRequested, &wsaData) != 0)
     {
       WSACleanup();
-      wxLogError(wxT("Failed to start winsock"));
+      err.Printf(_("Failed to start WinSock"));
       return -1;
     }
 #endif
 
 
-  // Create a new socket
-  if((sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) 
+
+  /*
+    Create socket
+  */
+  if((sock = socket(localAddr->ai_family, localAddr->ai_socktype, 0))
 #ifdef __WIN32__
      == INVALID_SOCKET)
 #else
     < 0)
 #endif
+  {
+    err.Printf(_("Could not create socket: %s\n"), strerror(errno));
+    freeaddrinfo(localAddr);
+    freeaddrinfo(multicastAddr);
     return -1;
+  }
 
-  // set to reuse address (and maybe port - needed on OSX)
+
+
+
+  /*
+    set to reuse address (and maybe port - needed on OSX)
+  */
   setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char*)&flag, sizeof(flag));
 #if defined (SO_REUSEPORT)
   setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, (char*)&flag, sizeof(flag));
 #endif
 
-  // Bind socket to port, returns 0 on success
-  if(bind(sock, (struct sockaddr*) &addrLocal, sizeof(addrLocal)) != 0) 
+
+
+  /*
+    Bind this socket to localAddr
+   */
+  if(bind(sock, localAddr->ai_addr, localAddr->ai_addrlen) != 0) 
     { 
 #ifdef __WIN32__
       closesocket(sock);
 #else
       close(sock);
 #endif 
+      freeaddrinfo(localAddr);
+      freeaddrinfo(multicastAddr);
       return -1;
     }
 
-  // Set the multicast ttl
-  setsockopt(sock, IPPROTO_IP, IP_MULTICAST_TTL, (char*)&ttl, sizeof(ttl));
 
-  // Add socket to be a member of the multicast group
-  setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&ipmr, sizeof(ipmr));
+
+  /*
+    Set the multicast TTL.
+  */
+  if ( setsockopt(sock,
+		  localAddr->ai_family == PF_INET6 ? IPPROTO_IPV6        : IPPROTO_IP,
+		  localAddr->ai_family == PF_INET6 ? IPV6_MULTICAST_HOPS : IP_MULTICAST_TTL,
+		  (char*) &multicastTTL, sizeof(multicastTTL)) != 0 ) {
+    err.Printf(_("Could not set multicast TTL: %s\n"), strerror(errno));
+    freeaddrinfo(localAddr);
+    freeaddrinfo(multicastAddr);
+    return -1;
+  }
+
+
+
+   /* 
+      Join the multicast group. We do this seperately depending on whether we
+      are using IPv4 or IPv6. 
+   */
+  if ( multicastAddr->ai_family  == PF_INET &&  
+       multicastAddr->ai_addrlen == sizeof(struct sockaddr_in) ) /* IPv4 */
+    {
+      struct ip_mreq multicastRequest;  // Multicast address join structure
+
+      /* Specify the multicast group */
+      memcpy(&multicastRequest.imr_multiaddr,
+	     &((struct sockaddr_in*)(multicastAddr->ai_addr))->sin_addr,
+	     sizeof(multicastRequest.imr_multiaddr));
+
+      /* Accept multicast from any interface */
+      multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
+
+      /* Join the multicast address */
+      if ( setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*) &multicastRequest, sizeof(multicastRequest)) != 0 )  {
+	err.Printf(_("Could not join multicast group: %s\n"), strerror(errno));
+	freeaddrinfo(localAddr);
+	freeaddrinfo(multicastAddr);
+	return -1;
+      }
 	
-  // set to nonblock
+    }
+  else if ( multicastAddr->ai_family  == PF_INET6 &&
+	    multicastAddr->ai_addrlen == sizeof(struct sockaddr_in6) ) /* IPv6 */
+    {
+      struct ipv6_mreq multicastRequest;  /* Multicast address join structure */
+
+      /* Specify the multicast group */
+      memcpy(&multicastRequest.ipv6mr_multiaddr,
+	     &((struct sockaddr_in6*)(multicastAddr->ai_addr))->sin6_addr,
+	     sizeof(multicastRequest.ipv6mr_multiaddr));
+
+      /* Accept multicast from any interface */
+      multicastRequest.ipv6mr_interface = 0;
+
+      /* Join the multicast address */
+      if ( setsockopt(sock, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, (char*) &multicastRequest, sizeof(multicastRequest)) != 0 ) {
+	err.Printf(_("Could not join multicast group: %s\n"), strerror(errno));
+	freeaddrinfo(localAddr);
+	freeaddrinfo(multicastAddr);
+	return -1;
+      }
+    }
+  else {
+    err.Printf(_("Neither IPv4 or IPv6"));
+    freeaddrinfo(localAddr);
+    freeaddrinfo(multicastAddr);
+    return -1;
+  }
+ 
+
+
+ 	
+  /* 
+     Set to nonblock
+  */
 #ifdef __WIN32__
   unsigned long block=1;
   ioctlsocket(sock, FIONBIO, &block);
@@ -375,8 +490,15 @@ SOCKET wxServDisc::msock()
   flag |= O_NONBLOCK;
   fcntl(sock, F_SETFL, flag);
 #endif
+
+
 	
-  // whooaa, that's it
+  /*
+    whooaa, that's it
+  */
+  freeaddrinfo(localAddr);
+  freeaddrinfo(multicastAddr);
+  
   return sock;
 }
 
