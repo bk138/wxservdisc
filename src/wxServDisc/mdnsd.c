@@ -1,6 +1,10 @@
 #include "mdnsd.h"
 #include <string.h>
 #include <stdlib.h>
+#ifdef __WIN32__
+// for the inet related functions
+#include <ws2tcpip.h>
+#endif
 
 #define bzero(b,len) (memset((b), '\0', (len)), (void) 0)
 
