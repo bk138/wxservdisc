@@ -53,9 +53,9 @@ Prerequisites:  wxWidgets >= 2.8
 	./configure && make 
    
 
-   OR (when building for Win32 with mingw):
+   OR (when building for Win32 with mingw-w64):
 
-        ./configure --build=<your build target name> --host=i586-mingw32msvc \
+        ./configure --build=<your build target name> --host=i686-w64-mingw32 \
                --with-wx-config=<your win32 wx-config>  && make
 
 
