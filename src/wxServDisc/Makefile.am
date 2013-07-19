@@ -11,6 +11,7 @@ libwxservdisc_la_LDFLAGS = -no-undefined -version-info 0:3:0
 libwxservdisc_la_LIBADD = $(WX_LIBS)
 if MINGW
 libwxservdisc_la_LIBADD += -lws2_32
+libwxservdisc_la_LDFLAGS += -static-libgcc -static-libstdc++
 endif
 
 
