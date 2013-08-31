@@ -44,14 +44,16 @@ sdwrap_SOURCES = \
 	gui/res/icon.icns
 
 
+sdwrap_LDFLAGS = 
+
 if MINGW
 sdwrap_SOURCES += gui/winres.rc
+sdwrap_LDFLAGS += -static-libgcc -static-libstdc++
 .rc.o:
 	 $(WX_RESCOMP) -o $@ $<
 endif
 
 
-sdwrap_LDFLAGS = 
 
 sdwrap_LDADD = \
 	../wxServDisc/libwxservdisc.la \
