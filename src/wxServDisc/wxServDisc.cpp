@@ -326,7 +326,7 @@ SOCKET wxServDisc::msock()
     return -1;
   }
  
-  wxLogDebug(wxT("wxServDisc %p: Using %s"), this, multicastAddr->ai_family == PF_INET6 ? "IPv6" : "IPv4");   
+  wxLogDebug(wxT("wxServDisc %p: Using %s"), this, multicastAddr->ai_family == PF_INET6 ? wxT("IPv6") : wxT("IPv4"));   
  
 
   /* 
