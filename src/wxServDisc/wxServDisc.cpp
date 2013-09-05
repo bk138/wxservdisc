@@ -49,6 +49,13 @@
 #include "wxServDisc.h"
 
 
+// Compatability defines
+#ifdef __APPLE__
+#ifndef IPV6_ADD_MEMBERSHIP
+#define IPV6_ADD_MEMBERSHIP IPV6_JOIN_GROUP
+#define IPV6_DROP_MEMBERSHIP IPV6_LEAVE_GROUP
+#endif
+#endif
 
 
 // define our new notify event!
