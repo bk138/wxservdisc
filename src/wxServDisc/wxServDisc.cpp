@@ -320,6 +320,21 @@ SOCKET wxServDisc::msock()
   struct addrinfo* localAddr;      // Local address to bind to
 
 
+ 
+#ifdef __WIN32__
+  /*
+    Start up WinSock
+   */
+  WORD		wVersionRequested;
+  WSADATA	wsaData;
+  wVersionRequested = MAKEWORD(2, 2);
+  if(WSAStartup(wVersionRequested, &wsaData) != 0)
+    {
+      WSACleanup();
+      err.Printf(_("Failed to start WinSock!"));
+      return -1;
+    }
+#endif
 
   
   /* 
@@ -351,20 +366,6 @@ SOCKET wxServDisc::msock()
    
 
 
-  /*
-    Start up WinSock
-   */
-#ifdef __WIN32__
-  WORD		wVersionRequested;
-  WSADATA	wsaData;
-  wVersionRequested = MAKEWORD(2, 2);
-  if(WSAStartup(wVersionRequested, &wsaData) != 0)
-    {
-      WSACleanup();
-      err.Printf(_("Failed to start WinSock"));
-      return -1;
-    }
-#endif
 
 
 
@@ -383,7 +384,6 @@ SOCKET wxServDisc::msock()
     freeaddrinfo(multicastAddr);
     return -1;
   }
-
 
 
 
