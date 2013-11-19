@@ -37,8 +37,9 @@ MyDialogSettings::MyDialogSettings(wxWindow* parent, int id, const wxString& tit
 
   // Add it to the dialog's main sizer 
   GetSizer()->Add(std_buttonsizer, 0, wxEXPAND | wxALL, 3);
-    
+
   // and resize to fit
+  GetSizer()->SetSizeHints(this);
   Fit();
 }
 
