@@ -85,6 +85,7 @@ wxThread::ExitCode wxServDisc::Entry()
   SOCKET s;
   bool exit = false;
 
+  mWallClock.Start();
 
   d = mdnsd_new(1,1000);
 
@@ -271,6 +272,8 @@ int wxServDisc::ans(mdnsda a, void *arg)
 
   result.name = wxString((char*)a->rdname, wxConvUTF8);
 
+  result.time = moi->mWallClock.Time();
+
   struct in_addr ip;
   ip.s_addr =  ntohl(a->ip);
   result.ip = wxString(inet_ntoa(ip), wxConvUTF8); 
@@ -291,6 +294,7 @@ int wxServDisc::ans(mdnsda a, void *arg)
   wxLogDebug(wxT("wxServDisc %p: got answer:"), moi);
   wxLogDebug(wxT("wxServDisc %p:    key:  %s"), moi, key.c_str());
   wxLogDebug(wxT("wxServDisc %p:    ttl:  %i"), moi, (int)a->ttl);
+  wxLogDebug(wxT("wxServDisc %p:    time: %lu"), moi, result.time);
   if(a->ttl != 0) {
     wxLogDebug(wxT("wxServDisc %p:    name: %s"), moi, moi->results[key].name.c_str());
     wxLogDebug(wxT("wxServDisc %p:    ip:   %s"), moi, moi->results[key].ip.c_str());
@@ -549,7 +553,7 @@ wxServDisc::~wxServDisc()
   wxLogDebug(wxT("wxServDisc %p: before scanthread delete"), this);
   GetThread()->Delete(); // blocks, this makes TestDestroy() return true and cleans up the thread
 
-  wxLogDebug(wxT("wxServDisc %p: scanthread deleted, wxServDisc destroyed, query was '%s'"), this, query.c_str());
+  wxLogDebug(wxT("wxServDisc %p: scanthread deleted, wxServDisc destroyed, query was '%s', lifetime was %ld"), this, query.c_str(), mWallClock.Time());
   wxLogDebug(wxT("")); 
 }
 

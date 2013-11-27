@@ -28,6 +28,7 @@
 #include <wx/event.h>
 #include <wx/string.h>
 #include <wx/hashmap.h>
+#include <wx/stopwatch.h>
 #include <vector>
 
 #include "1035.h"
@@ -57,7 +58,8 @@ struct wxSDEntry
   wxString name;
   wxString ip;
   int port;
-  wxSDEntry() { port=0; }
+  long time;
+  wxSDEntry() { port=0; time=0; }
 };
 
 
@@ -88,6 +90,7 @@ private:
   int querytype; 
 WX_DECLARE_STRING_HASH_MAP(wxSDEntry, wxSDMap);
   wxSDMap results;
+  wxStopWatch mWallClock;
   
   // this runs as a separate thread
   virtual wxThread::ExitCode Entry();
