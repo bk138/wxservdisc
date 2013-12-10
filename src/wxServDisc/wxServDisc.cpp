@@ -82,17 +82,12 @@ wxThread::ExitCode wxServDisc::Entry()
   unsigned short int port;
   struct timeval *tv;
   fd_set fds;
-  SOCKET s;
   bool exit = false;
 
   mWallClock.Start();
 
   d = mdnsd_new(1,1000);
 
-  if((s = msock()) < 0) { 
-    wxLogDebug(wxT("Ouch, error creating socket: ") + err);
-    exit = true;
-  }
 
   // register query(w,t) at mdnsd d, submit our address for callback ans()
   mdnsd_query(d, query.char_str(), querytype, ans, this);
@@ -127,13 +122,13 @@ wxThread::ExitCode wxServDisc::Entry()
 	  tv->tv_usec = 100000; // 100 ms
 
 	  FD_ZERO(&fds);
-	  FD_SET(s,&fds);
+	  FD_SET(mSock,&fds);
 
 
 #ifdef __WXGTK__
 	  sigprocmask(SIG_BLOCK, &newsigs, &oldsigs);
 #endif
-	  datatoread = select(s+1,&fds,0,0,tv); // returns 0 if timeout expired
+	  datatoread = select(mSock+1,&fds,0,0,tv); // returns 0 if timeout expired
 
 #ifdef __WXGTK__
 	  sigprocmask(SIG_SETMASK, &oldsigs, NULL);
@@ -149,15 +144,15 @@ wxThread::ExitCode wxServDisc::Entry()
 		 this, datatoread>0, msecs<=0, datatoread==-1, GetThread()->TestDestroy() );
 
       // receive
-      if(FD_ISSET(s,&fds))
+      if(FD_ISSET(mSock,&fds))
         {
-	  while(recvm(&m, s, &ip, &port) > 0)
+	  while(recvm(&m, mSock, &ip, &port) > 0)
 	    mdnsd_in(d, &m, ip, port);
         }
 
       // send
       while(mdnsd_out(d,&m,&ip,&port))
-	if(!sendm(&m, s, ip, port))
+	if(!sendm(&m, mSock, ip, port))
 	  {
 	    exit = true;
 	    break;
@@ -168,11 +163,11 @@ wxThread::ExitCode wxServDisc::Entry()
   mdnsd_free(d);
 
 #ifdef __WIN32__
-  if(sock != INVALID_SOCKET)
-    closesocket(sock);
+  if(mSock != INVALID_SOCKET)
+    closesocket(mSock);
 #else
-  if(sock >= 0)
-    close(sock);
+  if(mSock >= 0)
+    close(mSock);
 #endif 
     
   wxLogDebug(wxT("wxServDisc %p: scanthread exiting"), this);
@@ -312,6 +307,8 @@ int wxServDisc::ans(mdnsda a, void *arg)
 // windows or unix style
 SOCKET wxServDisc::msock() 
 {
+  SOCKET sock;
+
   int multicastTTL = 255; // multicast TTL, must be 255 for zeroconf!
   const char* mcAddrStr = "224.0.0.251";
   const char* mcPortStr = "5353";
@@ -534,6 +531,11 @@ wxServDisc::wxServDisc(void* p, const wxString& what, int type)
 
   wxLogDebug(wxT(""));
   wxLogDebug(wxT("wxServDisc %p: about to query '%s'"), this, query.c_str());
+
+  if((mSock = msock()) < 0) { 
+    wxLogDebug(wxT("Ouch, error creating socket: ") + err);
+    return;
+  }
 
 #if wxVERSION_NUMBER >= 2905 // 2.9.4 still has a bug here: http://trac.wxwidgets.org/ticket/14626  
   if( CreateThread(wxTHREAD_DETACHED) != wxTHREAD_NO_ERROR )

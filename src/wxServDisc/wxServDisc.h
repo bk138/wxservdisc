@@ -71,7 +71,10 @@ public:
   // type can be one of QTYPE_A, QTYPE_NS, QTYPE_CNAME, QTYPE_PTR or QTYPE_SRV 
   wxServDisc(void* parent, const wxString& what, int type);
   ~wxServDisc();
-  
+ 
+  /// Returns true if service discovery successfully started. If not, getErr() may contain a hint.
+  const bool isOK() const { return err.length() == 0; };
+ 
   // yeah well...
   std::vector<wxSDEntry> getResults() const;
   size_t getResultCount() const;
@@ -83,7 +86,7 @@ public:
 
 
 private:
-  SOCKET sock;
+  SOCKET mSock;
   wxString err;
   void *parent;
   wxString query;
