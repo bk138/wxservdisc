@@ -1,13 +1,16 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Created by Anjuta application wizard.
 
+# init
 AC_INIT(wxServDisc, 0.3)
+AM_INIT_AUTOMAKE([subdir-objects foreign])
+AC_CONFIG_MACRO_DIR([m4])
 
-
-AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
+# if this macro is defined, use it
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+
+# the file where results of system scan go, e.g. is there some header file or not
 AM_CONFIG_HEADER(config.h)
-AM_MAINTAINER_MODE
 
 
 
