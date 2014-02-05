@@ -35,6 +35,17 @@ AM_CONDITIONAL(MINGW, [ test "$HOST_IS_WINDOWS" = "yes" ])
 AM_CONDITIONAL(DARWIN, [ test "$HOST_IS_DARWIN" = "yes" ])
 
 
+#
+# Add some OSX specific flags if needed, otherwise the C++ stuff isnt found on 10.9 mavericks	
+#
+if test "$HOST_IS_DARWIN" = "yes"; then
+    CXXFLAGS="$CXXFLAGS -mmacosx-version-min=10.8"
+    OBJCXXFLAGS="$OBJCXXFLAGS -mmacosx-version-min=10.8"
+fi
+
+
+
+
 
 WXCONFIG=wx-config
 AC_ARG_WITH(wx-config,
@@ -67,21 +78,6 @@ if wxversion=`$WXCONFIG --version`; then
 else
     AC_MSG_RESULT([not found])
     AC_MSG_ERROR([wxWidgets is required. Try --with-wx-config.])
-fi
-
-dnl check for universal wx lib
-if test "$HOST_IS_DARWIN" = "yes"; then
-   AC_MSG_CHECKING([whether wxWidgets is a universal lib])
-   if test ! -z "`$WXCONFIG --libs | grep "arch i386" 2>/dev/null`" \
-        -a ! -z "`$WXCONFIG --libs | grep "arch ppc" 2>/dev/null`"; then
-     CC="gcc -arch i386 -arch ppc"
-     CXX="g++ -arch i386 -arch ppc"
-     CPP="cpp"
-     CXXCPP="cpp"
-     AC_MSG_RESULT([yes])
-   else
-     AC_MSG_RESULT([no])
-   fi
 fi
 
 

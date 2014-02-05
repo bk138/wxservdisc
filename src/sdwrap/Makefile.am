@@ -44,7 +44,7 @@ sdwrap_SOURCES = \
 	gui/res/icon.icns
 
 
-sdwrap_LDFLAGS = 
+sdwrap_LDFLAGS = $(WX_LDFLAGS) 
 
 if MINGW
 sdwrap_SOURCES += gui/winres.rc
