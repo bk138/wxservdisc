@@ -73,7 +73,7 @@ public:
   ~wxServDisc();
  
   /// Returns true if service discovery successfully started. If not, getErr() may contain a hint.
-  const bool isOK() const { return err.length() == 0; };
+  bool isOK() const { return err.length() == 0; };
  
   // yeah well...
   std::vector<wxSDEntry> getResults() const;

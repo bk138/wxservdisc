@@ -45,6 +45,10 @@ fi
 
 
 
+# force code quality ;-)
+CXXFLAGS="$CXXFLAGS -Wall -Wextra -Werror -Wno-unused-parameter -Wno-empty-body"
+
+
 
 
 WXCONFIG=wx-config
