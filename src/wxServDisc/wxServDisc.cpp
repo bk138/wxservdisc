@@ -33,9 +33,10 @@
 
 
 #ifdef __WIN32__
-// mingw socket includes
+// mingw/ visual studio socket includes
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <stdio.h>
 #else
 // unix socket includes
 #include <sys/socket.h>
@@ -44,6 +45,11 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#endif
+
+// only used by VC++
+#ifdef _WIN32
+#pragma comment(lib, "Ws2_32.lib")
 #endif
 
 #include "wxServDisc.h"
@@ -178,7 +184,7 @@ wxThread::ExitCode wxServDisc::Entry()
 
 
 
-bool wxServDisc::sendm(struct message* m, SOCKET s, unsigned long int ip, unsigned short int port)
+bool wxServDisc::sendm(struct message* m, int s, unsigned long int ip, unsigned short int port)
 {
   struct sockaddr_in to;
  
@@ -201,7 +207,7 @@ bool wxServDisc::sendm(struct message* m, SOCKET s, unsigned long int ip, unsign
 
 
 
-int wxServDisc::recvm(struct message* m, SOCKET s, unsigned long int *ip, unsigned short int *port) 
+int wxServDisc::recvm(struct message* m, int s, unsigned long int *ip, unsigned short int *port) 
 {
   struct sockaddr_in from;
   int bsize;
@@ -305,9 +311,9 @@ int wxServDisc::ans(mdnsda a, void *arg)
 // create a multicast 224.0.0.251:5353 socket,
 // aproppriate for receiving and sending,
 // windows or unix style
-SOCKET wxServDisc::msock() 
+int wxServDisc::msock() 
 {
-  SOCKET sock;
+  int sock;
 
   int multicastTTL = 255; // multicast TTL, must be 255 for zeroconf!
   const char* mcAddrStr = "224.0.0.251";
@@ -553,7 +559,8 @@ wxServDisc::wxServDisc(void* p, const wxString& what, int type)
 wxServDisc::~wxServDisc()
 {
   wxLogDebug(wxT("wxServDisc %p: before scanthread delete"), this);
-  GetThread()->Delete(); // blocks, this makes TestDestroy() return true and cleans up the thread
+  if(GetThread() && GetThread()->IsRunning())
+    GetThread()->Delete(); // blocks, this makes TestDestroy() return true and cleans up the thread
 
   wxLogDebug(wxT("wxServDisc %p: scanthread deleted, wxServDisc destroyed, query was '%s', lifetime was %ld"), this, query.c_str(), mWallClock.Time());
   wxLogDebug(wxT("")); 
