@@ -34,12 +34,27 @@
 #include "1035.h"
 #include "mdnsd.h"
 
-// just for convenience
-// SOCKET is a unsigned int in win32!!
-// but in unix we expect signed ints!!
-#ifndef __WIN32__
-typedef int SOCKET;
+// all the nice socket includes in one place here
+#ifdef _WIN32
+// https://stackoverflow.com/questions/5004858/stdmin-gives-error
+#define NOMINMAX
+// mingw/ visual studio socket includes
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#define SHUT_RDWR SD_BOTH
+#else // proper UNIX
+typedef int SOCKET;       // under windows, SOCKET is unsigned
+#define INVALID_SOCKET -1 // so there also is no -1 return value
+#define closesocket(s) close(s) // under windows, it's called closesocket
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/un.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 #endif
+
+
 
 
 // make available custom notify event if getResults() would yield sth new

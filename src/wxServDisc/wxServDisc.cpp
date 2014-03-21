@@ -32,20 +32,6 @@
 #include <csignal>
 
 
-#ifdef __WIN32__
-// mingw/ visual studio socket includes
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <stdio.h>
-#else
-// unix socket includes
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <sys/un.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#endif
 
 // only used by VC++
 #ifdef _WIN32
@@ -168,13 +154,10 @@ wxThread::ExitCode wxServDisc::Entry()
   mdnsd_shutdown(d);
   mdnsd_free(d);
 
-#ifdef __WIN32__
+
   if(mSock != INVALID_SOCKET)
     closesocket(mSock);
-#else
-  if(mSock >= 0)
-    close(mSock);
-#endif 
+
     
   wxLogDebug(wxT("wxServDisc %p: scanthread exiting"), this);
 
@@ -184,7 +167,7 @@ wxThread::ExitCode wxServDisc::Entry()
 
 
 
-bool wxServDisc::sendm(struct message* m, int s, unsigned long int ip, unsigned short int port)
+bool wxServDisc::sendm(struct message* m, SOCKET s, unsigned long int ip, unsigned short int port)
 {
   struct sockaddr_in to;
  
@@ -207,7 +190,7 @@ bool wxServDisc::sendm(struct message* m, int s, unsigned long int ip, unsigned 
 
 
 
-int wxServDisc::recvm(struct message* m, int s, unsigned long int *ip, unsigned short int *port) 
+int wxServDisc::recvm(struct message* m, SOCKET s, unsigned long int *ip, unsigned short int *port) 
 {
   struct sockaddr_in from;
   int bsize;
@@ -311,9 +294,9 @@ int wxServDisc::ans(mdnsda a, void *arg)
 // create a multicast 224.0.0.251:5353 socket,
 // aproppriate for receiving and sending,
 // windows or unix style
-int wxServDisc::msock() 
+SOCKET wxServDisc::msock() 
 {
-  int sock;
+  SOCKET sock;
 
   int multicastTTL = 255; // multicast TTL, must be 255 for zeroconf!
   const char* mcAddrStr = "224.0.0.251";
@@ -339,7 +322,7 @@ int wxServDisc::msock()
     {
       WSACleanup();
       err.Printf(_("Failed to start WinSock!"));
-      return -1;
+      return INVALID_SOCKET;
     }
 #endif
 
@@ -352,7 +335,7 @@ int wxServDisc::msock()
   hints.ai_flags  = AI_NUMERICHOST;
   if ((status = getaddrinfo(mcAddrStr, NULL, &hints, &multicastAddr)) != 0) {
     err.Printf(_("Could not get multicast address: %s\n"), gai_strerror(status));
-    return -1;
+    return INVALID_SOCKET;
   }
  
   wxLogDebug(wxT("wxServDisc %p: Using %s"), this, multicastAddr->ai_family == PF_INET6 ? wxT("IPv6") : wxT("IPv4"));   
@@ -368,7 +351,7 @@ int wxServDisc::msock()
   if ((status = getaddrinfo(NULL, mcPortStr, &hints, &localAddr)) != 0 ) {
     err.Printf(_("Could not get local address: %s\n"), gai_strerror(status));
     freeaddrinfo(multicastAddr);
-    return -1;
+    return INVALID_SOCKET;
   }
    
 
@@ -379,17 +362,12 @@ int wxServDisc::msock()
   /*
     Create socket
   */
-  if((sock = socket(localAddr->ai_family, localAddr->ai_socktype, 0))
-#ifdef __WIN32__
-     == INVALID_SOCKET)
-#else
-    < 0)
-#endif
-  {
+  if((sock = socket(localAddr->ai_family, localAddr->ai_socktype, 0)) == INVALID_SOCKET) {
     err.Printf(_("Could not create socket: %s\n"), strerror(errno));
+    // not yet a complete cleanup!
     freeaddrinfo(localAddr);
     freeaddrinfo(multicastAddr);
-    return -1;
+    return INVALID_SOCKET;
   }
 
 
@@ -407,18 +385,10 @@ int wxServDisc::msock()
   /*
     Bind this socket to localAddr
    */
-  if(bind(sock, localAddr->ai_addr, localAddr->ai_addrlen) != 0) 
-    { 
-#ifdef __WIN32__
-      closesocket(sock);
-#else
-      close(sock);
-#endif 
-      freeaddrinfo(localAddr);
-      freeaddrinfo(multicastAddr);
-      return -1;
-    }
-
+  if(bind(sock, localAddr->ai_addr, localAddr->ai_addrlen) != 0) {
+    err.Printf(_("Could not bind socket: %s\n"), strerror(errno));
+    goto CompleteCleanUp;
+  }
 
 
   /*
@@ -429,10 +399,8 @@ int wxServDisc::msock()
 		  localAddr->ai_family == PF_INET6 ? IPV6_MULTICAST_HOPS : IP_MULTICAST_TTL,
 		  (char*) &multicastTTL, sizeof(multicastTTL)) != 0 ) {
     err.Printf(_("Could not set multicast TTL: %s\n"), strerror(errno));
-    freeaddrinfo(localAddr);
-    freeaddrinfo(multicastAddr);
-    return -1;
-  }
+    goto CompleteCleanUp;
+   }
 
 
 
@@ -456,9 +424,7 @@ int wxServDisc::msock()
       /* Join the multicast address */
       if ( setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*) &multicastRequest, sizeof(multicastRequest)) != 0 )  {
 	err.Printf(_("Could not join multicast group: %s\n"), strerror(errno));
-	freeaddrinfo(localAddr);
-	freeaddrinfo(multicastAddr);
-	return -1;
+	goto CompleteCleanUp;
       }
 	
     }
@@ -478,16 +444,12 @@ int wxServDisc::msock()
       /* Join the multicast address */
       if ( setsockopt(sock, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, (char*) &multicastRequest, sizeof(multicastRequest)) != 0 ) {
 	err.Printf(_("Could not join multicast group: %s\n"), strerror(errno));
-	freeaddrinfo(localAddr);
-	freeaddrinfo(multicastAddr);
-	return -1;
+	goto CompleteCleanUp;
       }
     }
   else {
     err.Printf(_("Neither IPv4 or IPv6"));
-    freeaddrinfo(localAddr);
-    freeaddrinfo(multicastAddr);
-    return -1;
+    goto CompleteCleanUp;
   }
  
 
@@ -496,7 +458,7 @@ int wxServDisc::msock()
   /* 
      Set to nonblock
   */
-#ifdef __WIN32__
+#ifdef _WIN32
   unsigned long block=1;
   ioctlsocket(sock, FIONBIO, &block);
 #else
@@ -514,6 +476,16 @@ int wxServDisc::msock()
   freeaddrinfo(multicastAddr);
   
   return sock;
+
+
+
+ CompleteCleanUp:
+  
+  closesocket(sock);
+  freeaddrinfo(localAddr);
+  freeaddrinfo(multicastAddr);
+  return INVALID_SOCKET;
+  
 }
 
 
@@ -538,7 +510,7 @@ wxServDisc::wxServDisc(void* p, const wxString& what, int type)
   wxLogDebug(wxT(""));
   wxLogDebug(wxT("wxServDisc %p: about to query '%s'"), this, query.c_str());
 
-  if((mSock = msock()) < 0) { 
+  if((mSock = msock()) == INVALID_SOCKET) { 
     wxLogDebug(wxT("Ouch, error creating socket: ") + err);
     return;
   }
