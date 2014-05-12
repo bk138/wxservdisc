@@ -573,7 +573,7 @@ void wxServDisc::post_notify()
       event.SetEventObject(this); // set sender
       
       // Send it
-      wxPostEvent((wxEvtHandler*)parent, event);
+      wxQueueEvent((wxEvtHandler*)parent, event.Clone());
     }
 }
 
