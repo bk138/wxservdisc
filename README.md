@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/bk138/wxservdisc.svg?branch=master)](https://travis-ci.org/bk138/wxservdisc)
 
 wxServDisc - a wxwidgets zeroconf service discovery module
 ==========================================================
