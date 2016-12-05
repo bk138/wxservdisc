@@ -13,8 +13,8 @@ compiler:
 
 # install build dependencies
 before_install:
-  - [ "$TRAVIS_OS_NAME" = "linux" ] && { sudo apt-get install libwxgtk3.0-dev }
-  - [ "$TRAVIS_OS_NAME" = "osx" ] && { brew update; brew install wxmac }
+  - '[ "$TRAVIS_OS_NAME" = "linux" ] && { sudo apt-get install libwxgtk3.0-dev }'
+  - '[ "$TRAVIS_OS_NAME" = "osx" ] && { brew update; brew install wxmac }'
 
 # Build steps
 script:
