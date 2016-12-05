@@ -111,6 +111,6 @@ AM_PROG_LIBTOOL
 AC_OUTPUT([
 Makefile
 src/Makefile
-src/wxServDisc/Makefile
-src/sdwrap/Makefile
+examples/Makefile
+examples/sdwrap/Makefile
 ])

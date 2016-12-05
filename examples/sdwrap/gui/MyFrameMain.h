@@ -27,7 +27,7 @@
 
 
 #include "FrameMain.h"
-#include "../wxServDisc/wxServDisc.h"
+#include <wxServDisc.h>
 
 
 

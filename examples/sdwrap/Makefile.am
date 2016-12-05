@@ -3,7 +3,8 @@
 
 
 AM_CPPFLAGS = \
-	$(WX_CPPFLAGS)
+	$(WX_CPPFLAGS)\
+	-I../../src
 
 AM_CXXFLAGS =\
 	 -Wall \
@@ -56,7 +57,7 @@ endif
 
 
 sdwrap_LDADD = \
-	../wxServDisc/libwxservdisc.la \
+	../../src/libwxservdisc.la \
 	$(WX_LIBS)
 
 

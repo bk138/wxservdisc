@@ -3,7 +3,8 @@
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
-	src
+	src \
+	examples
 
 
 wxservdiscdocdir = ${datadir}/doc/wxservdisc
