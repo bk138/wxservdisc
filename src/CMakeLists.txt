@@ -10,7 +10,7 @@ SET(wxservdisc_LIB_SRCS
    mdnsd.h
 )
 
-add_library(wxservdisc SHARED ${wxservdisc_LIB_SRCS})
+add_library(wxservdisc ${wxservdisc_LIB_SRCS})
 
 
 #
