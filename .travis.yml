@@ -2,9 +2,19 @@ language: cpp
 dist: trusty
 sudo: required
 
+os:
+  - linux
+  - osx
+
+compiler:
+  - gcc
+  - clang
+
+
 # install build dependencies
 before_install:
-  - sudo apt-get install libwxgtk3.0-dev
+  - [ "$TRAVIS_OS_NAME" = "linux" ] && { sudo apt-get install libwxgtk3.0-dev }
+  - [ "$TRAVIS_OS_NAME" = "osx" ] && { brew update; brew install wxmac }
 
 # Build steps
 script:
