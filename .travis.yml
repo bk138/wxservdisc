@@ -6,10 +6,6 @@ os:
   - linux
   - osx
 
-compiler:
-  - gcc
-  - clang
-
 
 # install build dependencies
 before_install:
