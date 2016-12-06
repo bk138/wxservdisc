@@ -51,19 +51,14 @@ BUILDING:
 
 Prerequisites:  wxWidgets >= 2.8
 
-	./configure && make 
-   
+wxServDisc uses CMake as its build system. Thus, it's the usual:
 
-   OR (when building for Win32 with mingw-w64):
+    mkdir build
+    cd build
+    cmake ..
+    make
 
-        ./configure --build=<your build target name> --host=i686-w64-mingw32 \
-               --with-wx-config=<your win32 wx-config>  && make
-
-
-   OR (when building under OS X):
-       
-       ./configure && make && make appbundle
-
+from the root of the source tree.
 
 
 
