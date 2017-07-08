@@ -6,6 +6,7 @@ SET(wxservdisc_LIB_SRCS
    1035.c
    mdnsd.c
    wxServDisc.cpp
+   wxServDisc.h
    1035.h
    mdnsd.h
 )
