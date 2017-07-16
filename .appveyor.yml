@@ -1,3 +1,6 @@
+environment:
+  global:
+    wxWidgets_ROOT_DIR: C:\wxWidgets-3.1.0\
 
 os:
   - Visual Studio 2013
