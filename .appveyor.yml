@@ -3,25 +3,17 @@ os:
   - Visual Studio 2015
 
 install:
-  - mkdir deps
-  - cd deps
   # wx-headers
-  - mkdir wx
-  - cd wx
   - curl -fsSL -o wx-headers.7z https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.3/wxWidgets-3.0.3-headers.7z
-  - 7z x wx-headers.7z
+  - 7z x wx-headers.7z -OC:\wx
   # wx-libs
   - curl -fsSL -o wx-libs.7z https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.3/wxMSW-3.0.3_vc140_x64_Dev.7z
-  - 7z x wx-libs.7z
-  # leave wx dir
-  - cd ..
-  # leave deps dir
-  - cd ..
+  - 7z x wx-libs.7z -OC:\wx
 
 
 build_script:
   - mkdir build
   - cd build 
-  - cmake .. -DwxWidgets_ROOT_DIR:PATH=../deps/wx -DWX_ROOT_DIR:INTERNAL=../deps/wx -DwxWidgets_LIB_DIR:PATH=../deps/wx/lib/vc140_x64_dll -DwxWidgets_CONFIGURATION:STRING=mswu
+  - cmake .. -DwxWidgets_ROOT_DIR:PATH=C:/wx -DWX_ROOT_DIR:INTERNAL=C:/wx -DwxWidgets_LIB_DIR:PATH=C:/wx/lib/vc140_x64_dll -DwxWidgets_CONFIGURATION:STRING=mswu
   - cmake --build .
 
