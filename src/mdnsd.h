@@ -6,7 +6,7 @@ extern "C"
 #ifndef mdnsd_h
 #define mdnsd_h
 #include "1035.h"
-#include <sys/time.h>
+
 
 typedef struct mdnsd_struct *mdnsd; // main daemon data
 typedef struct mdnsdr_struct *mdnsdr; // record entry
