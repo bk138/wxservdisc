@@ -1,17 +1,27 @@
-environment:
-  global:
-    wxWidgets_ROOT_DIR: C:\wxWidgets-3.1.0\
 
 os:
-  - Visual Studio 2013
   - Visual Studio 2015
 
 install:
-  - choco install wxwidgets
+  - mkdir deps
+  - cd deps
+  # wx-headers
+  - mkdir wx
+  - cd wx
+  - curl -fsSL -o wx-headers.7z https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.3/wxWidgets-3.0.3-headers.7z
+  - 7z x wx-headers.7z
+  # wx-libs
+  - curl -fsSL -o wx-libs.7z https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.3/wxMSW-3.0.3_vc140_x64_Dev.7z
+  - 7z x wx-libs.7z
+  # leave wx dir
+  - cd ..
+  # leave deps dir
+  - cd ..
+
 
 build_script:
   - mkdir build
   - cd build 
-  - cmake ..
+  - cmake .. -DwxWidgets_INCLUDE_DIRS=..\deps\wx\include -DwxWidgets_LIBRARIES=..\deps\wx\lib\vc140_x64_dll
   - cmake --build .
 
