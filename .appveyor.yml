@@ -22,6 +22,6 @@ install:
 build_script:
   - mkdir build
   - cd build 
-  - cmake .. -DwxWidgets_ROOT_DIR=..\deps\wx -DwxWidgets_LIB_DIR=..\deps\wx\lib\vc140_x64_dll -DwxWidgets_CONFIGURATION=mswu
+  - cmake .. -DwxWidgets_ROOT_DIR=..\deps\wx -DwxWidgets_LIB_DIR=..\deps\wx\lib\vc140_x64_dll -DwxWidgets_CONFIGURATION=mswu -DwxWidgets_EXCLUDE_COMMON_LIBRARIES=true
   - cmake --build .
 
