@@ -31,7 +31,8 @@ target_link_libraries(wxservdisc ${wxWidgets_LIBRARIES})
 #
 # installation
 #
-install(TARGETS wxservdisc DESTINATION lib)
+if(WXSERVDISC_INSTALL)
+  install(TARGETS wxservdisc DESTINATION lib)
 
-install(FILES  wxServDisc.h DESTINATION include)
-
+  install(FILES  wxServDisc.h DESTINATION include)
+endif()
