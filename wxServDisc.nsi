@@ -7,7 +7,7 @@ OutFile "wxServDisc_${VERSION}-setup.exe"
 InstallDir $PROGRAMFILES\wxServDisc
 
 Page license
-LicenseData COPYING.TXT
+LicenseData COPYING
 
 Page directory
 
@@ -19,14 +19,14 @@ Section ""
 
   #  dll not built by now
   #  File src\wxServDisc\wxServDisc.dll
-  File src\wxServDisc\libwxServDisc.a
-  File README.TXT
+  File build\src\Release\wxServDisc.lib
+  File README.md
 
   writeUninstaller $INSTDIR\wxServDisc-uninstall.exe
 
   # now the shortcuts
   CreateDirectory "$SMPROGRAMS\wxServDisc"
-  createShortCut  "$SMPROGRAMS\wxServDisc\Readme.lnk" "$INSTDIR\README.TXT"
+  createShortCut  "$SMPROGRAMS\wxServDisc\Readme.lnk" "$INSTDIR\README.md"
   createShortCut  "$SMPROGRAMS\wxServDisc\Uninstall wxServDisc.lnk" "$INSTDIR\wxServDisc-uninstall.exe"
 
 SectionEnd 
@@ -37,15 +37,12 @@ section "Uninstall"
   delete $INSTDIR\wxServDisc-uninstall.exe
 
   # now delete installed files
-  delete $INSTDIR\wxServDisc.dll
-  delete $INSTDIR\wxServDisc.a
-  delete $INSTDIR\NEWS.TXT
-  delete $INSTDIR\README.TXT
+  delete $INSTDIR\wxServDisc.lib
+  delete $INSTDIR\README.md
   RMDir  $INSTDIR
  
   # delete shortcuts
   delete "$SMPROGRAMS\wxServDisc\Readme.lnk"
-  delete "$SMPROGRAMS\wxServDisc\News.lnk"
   delete "$SMPROGRAMS\wxServDisc\Uninstall wxServDisc.lnk"
   RMDir  "$SMPROGRAMS\wxServDisc"
   
