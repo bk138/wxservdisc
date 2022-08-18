@@ -23,7 +23,7 @@ SET(sdwrap_SRCS
    gui/res/icon.icns
 )
 
-add_executable(sdwrap ${sdwrap_SRCS})
+add_executable(sdwrap WIN32 ${sdwrap_SRCS})
 
 
 
