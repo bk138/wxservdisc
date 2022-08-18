@@ -10,6 +10,9 @@ install:
   - curl -fsSL -o wx-libs.7z https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.0/wxMSW-3.2.0_vc14x_x64_Dev.7z
   - 7z x wx-libs.7z -OC:\wx
 
+# CMake >= 3.24 is needed for wxWidgets 3.20  
+before_build:
+  - choco upgrade cmake  
 
 build_script:
   - mkdir build
