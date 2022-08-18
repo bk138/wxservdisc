@@ -9,7 +9,17 @@
 #include <arpa/inet.h>
 #include <sys/time.h>
 #endif
-
+// for gettimeofday
+#include <fcntl.h>
+#include <conio.h>
+#include <sys/timeb.h>
+static void gettimeofday(struct timeval* tv,char* dummy)
+{
+   SYSTEMTIME t;
+   GetSystemTime(&t);
+   tv->tv_sec=t.wHour*3600+t.wMinute*60+t.wSecond;
+   tv->tv_usec=t.wMilliseconds*1000;
+}
 #define bzero(b,len) (memset((b), '\0', (len)), (void) 0)
 
 // size of query/publish hashes
