@@ -19,12 +19,10 @@ jobs:
       - name: Install Ubuntu Build Dependencies
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
-          sudo apt update
           sudo apt install libwxgtk3.0-gtk3-dev
       - name: Install MacOS Build Dependencies
         if: ${{ matrix.os == 'macos-latest' }}
         run: |
-          brew update
           brew install wxmac
       - name: Install Windows Build Dependencies
         if: ${{ matrix.os == 'windows-latest' }}
