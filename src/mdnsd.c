@@ -4,11 +4,6 @@
 #ifdef WIN32
 // for the inet related functions
 #include <ws2tcpip.h>
-#else
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/time.h>
-#endif
 // for gettimeofday
 #include <fcntl.h>
 #include <conio.h>
@@ -20,6 +15,11 @@ static void gettimeofday(struct timeval* tv,char* dummy)
    tv->tv_sec=t.wHour*3600+t.wMinute*60+t.wSecond;
    tv->tv_usec=t.wMilliseconds*1000;
 }
+#else
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/time.h>
+#endif
 #define bzero(b,len) (memset((b), '\0', (len)), (void) 0)
 
 // size of query/publish hashes
