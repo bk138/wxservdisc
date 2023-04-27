@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/bk138/wxservdisc.svg?branch=master)](https://travis-ci.org/bk138/wxservdisc) [![Build status](https://ci.appveyor.com/api/projects/status/f9bga2cpp77m2ab7?svg=true)](https://ci.appveyor.com/project/bk138/wxservdisc)
+[![CI](https://github.com/bk138/wxservdisc/actions/workflows/ci.yml/badge.svg)](https://github.com/bk138/wxservdisc/actions/workflows/ci.yml)
 
 
 wxServDisc - a wxwidgets zeroconf service discovery module
